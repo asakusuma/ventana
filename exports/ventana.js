@@ -1,7 +1,8 @@
-window.addEventListener('scroll', function() {
-  console.log('SWAG');
-});
-
 module.exports = {
-  on: function() {}
+  test: function(arg) {
+    console.log(arg || 'Testing 123')
+  },
+  getName: function() {
+    return 'Asa';
+  }
 };
