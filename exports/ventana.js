@@ -1,4 +1,20 @@
-!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var n;"undefined"!=typeof window?n=window:"undefined"!=typeof global?n=global:"undefined"!=typeof self&&(n=self),n.linkedinventana=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define([], function () {
+      return (factory());
+    });
+  } else if (typeof exports === 'object') {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like enviroments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    root['@linkedin/ventana'] = factory();
+  }
+}(this, function () {
+
+_(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"@linkedin/ventana":[function(_dereq_,module,exports){
 'use strict';
 
 var listenerMap = {
@@ -54,13 +70,15 @@ exports['default'] = {
   getWindowRect: function(offset) {
     offset = offset || {};
     return {
-      top: window.scrollY + (offset.top ? offset.top : 0),
-      left: window.scrollX + (offset.left ? offset.left : 0),
+      top: (window.scrollY || window.pageYOffset) + (offset.top ? offset.top : 0),
+      left: (window.scrollX || window.pageXOffset) + (offset.left ? offset.left : 0),
       height: window.innerHeight - (offset.top ? offset.top : 0) - (offset.bottom ? offset.bottom : 0),
       width: window.innerWidth - (offset.left ? offset.left : 0) - (offset.right ? offset.right : 0)
     };
   }
 };
-},{}]},{},[1])
-(1)
-});
+},{}]},{},["@linkedin/ventana"]);
+
+return _require("@linkedin/ventana");
+
+}));
