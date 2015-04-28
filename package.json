@@ -1,0 +1,25 @@
+{
+  "name": "ventana",
+  "description": "Viewport and window event utility microlibrary",
+  "version": "0.0.1",
+  "author": "Asa Kusuma",
+  "main": "exports/ventana.js",
+  "jsnext:main": "lib/ventana.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/asakusuma/ventana"
+  },
+  "keywords":["window", "viewport"],
+  "homepage": "https://github.com/asakusuma/ventana",
+  "devDependencies": {
+    "broccoli-es6-npm-compiler": "0.0.6"
+  },
+  "engines": {
+    "node": ">= 0.10.0"
+  },
+  "scripts": {
+    "test": "rm -rf dist && broccoli build dist && venus run -t test/specs/ -n",
+    "watch": "broccoli-timepiece dist/",
+    "build": "rm -rf dist && broccoli build dist; mv dist/ventana.js exports/ventana.js"
+  }
+}
