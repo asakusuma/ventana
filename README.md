@@ -1,2 +1,29 @@
 #ventana
-Window event microlibrary
+Window event microlibrary. Exposes a pretty API for window events and utilities.
+
+```JavaScript
+ventana.on('hide', function() {
+  console.log('User hid the current tab');
+});
+```
+
+##API
+
+**.on/.off(** *event*, *callback* **)**
+
+Bind to window events:
+
+* move
+* resize
+* destroy (close tab or entire window)
+* hide (move to another tab)
+* show
+
+**.mapBoundingRectToAbsolute(** *boundingRect* **)**
+
+The native DOM API exposes a nifty function called [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect), which returns positioning info about a DOM element. However, this info is relative to the viewport. Use **.mapBoundingRectToAbsolute** to map this object with relative positin to an object with absolute position.
+
+
+**.getWindowRect()**
+
+Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport.
