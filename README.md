@@ -9,7 +9,7 @@ ventana.on('hide', function() {
 
 ##API
 
-#####`ventana.on(Object target, Function callback)`
+#####ventana.on(Object target, Function callback)
 Bind to window events:
 
 * move
@@ -20,12 +20,12 @@ Bind to window events:
 
 <hr>
 
-#####`ventana.mapBoundingRectToAbsolute(Object boundingRect)` -> `Object`
+#####ventana.mapBoundingRectToAbsolute(Object boundingRect) -> Object
 
-The native DOM API exposes a nifty function called [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect), which returns positioning info about a DOM element. However, this info is relative to the viewport. Use **.mapBoundingRectToAbsolute** to map this object with relative positin to an object with absolute position.
+The native DOM API exposes a nifty function called [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect), which returns positioning info about a DOM element. However, this info is relative to the viewport. Use **.mapBoundingRectToAbsolute** to map this object with relative position values to an object with absolute position values.
 
 <hr>
 
-#####`ventana.getWindowRect()` -> `Object`
+#####ventana.getWindowRect() -> Object
 
 Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport.
