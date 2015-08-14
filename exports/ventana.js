@@ -18,18 +18,23 @@ function generateTrigger(key) {
   }
 }
 
+// detect the presence of DOM
+var hasDOM = (typeof window !== 'undefined') && window
+    && (typeof document !== 'undefined') && document;
 
 // Setup native listeners
-window.addEventListener('scroll', generateTrigger('move'));
-window.addEventListener('resize', generateTrigger('resize'));
-window.addEventListener('unload', generateTrigger('destroy'));
-document.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'visible') {
-    generateTrigger('show')();
-  } else {
-    generateTrigger('hide')();
-  }
-});
+if (hasDOM) {
+  window.addEventListener('scroll', generateTrigger('move'));
+  window.addEventListener('resize', generateTrigger('resize'));
+  window.addEventListener('unload', generateTrigger('destroy'));
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      generateTrigger('show')();
+    } else {
+      generateTrigger('hide')();
+    }
+  });
+}
 
 module.exports = {
   on: function(e, callback) {
