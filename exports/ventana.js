@@ -1,6 +1,8 @@
-(function (root, factory) { var artifact = factory();if (typeof define === 'function' && define.amd) { define('ventana', function () { return artifact; }); }if (typeof exports === 'object') { module.exports = artifact; }root['ventana'] = artifact;}(this, function () {var _require = (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"ventana":[function(_dereq_,module,exports){
 'use strict';
 
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
 var listenerMap = {
   resize: [],
   move: [],
@@ -10,24 +12,25 @@ var listenerMap = {
 };
 
 function generateTrigger(key) {
-  return function() {
-    var listeners = listenerMap[key], len = listeners.length, i = 0;
+  return function () {
+    var listeners = listenerMap[key],
+        len = listeners.length,
+        i = 0;
     for (i = 0; i < len; i++) {
       listeners[i].call(null);
     }
-  }
+  };
 }
 
 // detect the presence of DOM
-var hasDOM = (typeof window !== 'undefined') && window
-    && (typeof document !== 'undefined') && document;
+var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
 
 // Setup native listeners
 if (hasDOM) {
   window.addEventListener('scroll', generateTrigger('move'));
   window.addEventListener('resize', generateTrigger('resize'));
   window.addEventListener('unload', generateTrigger('destroy'));
-  document.addEventListener('visibilitychange', function() {
+  document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
       generateTrigger('show')();
     } else {
@@ -36,8 +39,8 @@ if (hasDOM) {
   });
 }
 
-module.exports = {
-  on: function(e, callback) {
+exports['default'] = {
+  on: function on(e, callback) {
     var listeners = listenerMap[e];
     if (listeners) {
       listeners.push(callback);
@@ -45,10 +48,10 @@ module.exports = {
       throw 'Ventana does not understand the event "' + e + '"';
     }
   },
-  off: function(e, callback) {
+  off: function off(e, callback) {
     // TODO
   },
-  mapBoundingRectToAbsolute: function(boundingRect) {
+  mapBoundingRectToAbsolute: function mapBoundingRectToAbsolute(boundingRect) {
     var dimensions = {};
     dimensions.top = boundingRect.top + window.scrollY;
     dimensions.left = boundingRect.left + window.scrollX;
@@ -56,7 +59,7 @@ module.exports = {
     dimensions.height = boundingRect.height;
     return dimensions;
   },
-  getWindowRect: function(offset) {
+  getWindowRect: function getWindowRect(offset) {
     offset = offset || {};
     return {
       top: (window.scrollY || window.pageYOffset) + (offset.top ? offset.top : 0),
@@ -66,6 +69,4 @@ module.exports = {
     };
   }
 };
-},{}]},{},["ventana"]);
-
-return _require("ventana");}));
+module.exports = exports['default'];

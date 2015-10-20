@@ -16,14 +16,16 @@
   "homepage": "https://github.com/asakusuma/ventana",
   "devDependencies": {
     "broccoli": "^0.16.2",
-    "broccoli-es6-npm-compiler": "0.1.2"
+    "broccoli-babel-transpiler": "^5.4.5",
+    "broccoli-merge-trees": "^0.2.3",
+    "broccoli-uglify-js": "0.1.3",
+    "broccoli-funnel": "^0.2.10"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "scripts": {
-    "test": "rm -rf dist && broccoli build dist && venus run -t test/specs/ -n",
-    "watch": "broccoli-timepiece dist/",
-    "build": "rm -rf dist && broccoli build dist; mv dist/ventana.js exports/ventana.js"
+    "watch": "broccoli-timepiece exports/",
+    "build": "rm -rf exports && broccoli build exports"
   }
 }
