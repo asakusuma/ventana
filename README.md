@@ -7,6 +7,9 @@ ventana.on('hide', function() {
 });
 ```
 
+## Usage
+Ventana is available as a [standard npm module](https://www.npmjs.com/package/ventana). Additionally, you can use the [minified UMD file](https://github.com/asakusuma/ventana/blob/master/exports/ventana.umd.js).
+
 ## API
 
 ##### `ventana.on(Object target, Function callback)`
