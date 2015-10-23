@@ -1,4 +1,4 @@
-# ventana
+# ventana [![Build Status](https://travis-ci.org/asakusuma/ventana.svg)](https://travis-ci.org/asakusuma/ventana)
 Window event microlibrary. Exposes a pretty API for window events and utilities.
 
 ```JavaScript
