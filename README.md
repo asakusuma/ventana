@@ -32,6 +32,6 @@ The native DOM API exposes a nifty function called [Element.getBoundingClientRec
 
 <hr>
 
-##### `ventana.getWindowRect()` -> `Object`
+##### `ventana.getWindowRect(Object offset)` -> `Object`
 
-Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport.
+Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport. You can pass an offset object that expects any combination of the following properties: top, left, bottom, right.
