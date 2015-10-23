@@ -35,7 +35,7 @@ function generateTrigger(key, wrapper) {
   return cb;
 }
 
-function setupMovelListener(trigger) {
+function setupMoveListener(trigger) {
   var cY = window.pageYOffset;
   var cX = window.pageXOffset;
   var pollForScroll = function pollForScroll() {
@@ -53,7 +53,11 @@ function setupMovelListener(trigger) {
 
 // Setup native listeners
 if (hasDOM) {
-  setupMovelListener(generateTrigger('move'));
+  if (rAF) {
+    setupMoveListener(generateTrigger('move'));
+  } else {
+    window.addEventListener('scroll', generateTrigger('move'));
+  }
   window.addEventListener('resize', generateTrigger('resize', rAF));
   window.addEventListener('unload', generateTrigger('destroy'));
   document.addEventListener('visibilitychange', function () {
