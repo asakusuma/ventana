@@ -15,11 +15,14 @@ Ventana is available as a [standard npm module](https://www.npmjs.com/package/ve
 ##### `ventana.on(Object target, Function callback)`
 Bind to window events:
 
-* move
-* resize
-* destroy (close tab or entire window)
-* hide (move to another tab)
-* show
+* **move** - Triggered when the user scrolls on either axis.
+* **resize**
+* **destroy** (close tab or entire window)
+* **hide** (move to another tab)
+* **show**
+
+#### Performance note
+For performance reasons, the move event (aka scroll) is [implemented](https://github.com/asakusuma/ventana/blob/master/lib/ventana.js#L32) via [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame).
 
 <hr>
 
