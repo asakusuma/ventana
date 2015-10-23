@@ -11,8 +11,13 @@ var listenerMap = {
   show: []
 };
 
-function generateTrigger(key) {
-  return function () {
+// detect the presence of DOM
+var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
+
+var rAF = hasDOM && window.requestAnimationFrame;
+
+function generateTrigger(key, wrapper) {
+  var cb = function cb() {
     var listeners = listenerMap[key],
         len = listeners.length,
         i = 0;
@@ -20,15 +25,36 @@ function generateTrigger(key) {
       listeners[i].call(null);
     }
   };
+
+  if (typeof wrapper === 'function') {
+    return function () {
+      wrapper(cb);
+    };
+  }
+
+  return cb;
 }
 
-// detect the presence of DOM
-var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
+function setupMovelListener(trigger) {
+  var cY = window.pageYOffset;
+  var cX = window.pageXOffset;
+  var pollForScroll = function pollForScroll() {
+    var nY = window.pageYOffset;
+    var nX = window.pageXOffset;
+    if (cY !== nY || cX !== nX) {
+      cY = nY;
+      cX = nX;
+      trigger.call(null);
+    }
+    rAF(pollForScroll);
+  };
+  rAF(pollForScroll);
+}
 
 // Setup native listeners
 if (hasDOM) {
-  window.addEventListener('scroll', generateTrigger('move'));
-  window.addEventListener('resize', generateTrigger('resize'));
+  setupMovelListener(generateTrigger('move'));
+  window.addEventListener('resize', generateTrigger('resize', rAF));
   window.addEventListener('unload', generateTrigger('destroy'));
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
