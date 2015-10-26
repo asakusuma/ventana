@@ -16,8 +16,8 @@ var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'und
 
 var rAF = hasDOM && window.requestAnimationFrame;
 
-function generateTrigger(key, wrapper) {
-  var cb = function cb() {
+function generateTrigger(key) {
+  return function () {
     var listeners = listenerMap[key],
         len = listeners.length,
         i = 0;
@@ -25,40 +25,47 @@ function generateTrigger(key, wrapper) {
       listeners[i].call(null);
     }
   };
-
-  if (typeof wrapper === 'function') {
-    return function () {
-      wrapper(cb);
-    };
-  }
-
-  return cb;
 }
 
-function setupMoveListener(trigger) {
+function setupRafListeners(triggers) {
   var cY = window.pageYOffset;
   var cX = window.pageXOffset;
-  var pollForScroll = function pollForScroll() {
+  var cW = window.innerWidth;
+  var cH = window.innerHeight;
+  var pollForAF = function pollForAF() {
     var nY = window.pageYOffset;
     var nX = window.pageXOffset;
+    var nH = window.innerWidth;
+    var nW = window.innerHeight;
     if (cY !== nY || cX !== nX) {
       cY = nY;
       cX = nX;
-      trigger.call(null);
+      triggers.move.call(null);
     }
-    rAF(pollForScroll);
+    if (cH !== nH || cW !== nW) {
+      cH = nH;
+      cW = nW;
+      triggers.resize.call(null);
+    }
+    rAF(pollForAF);
   };
-  rAF(pollForScroll);
+  rAF(pollForAF);
 }
 
 // Setup native listeners
 if (hasDOM) {
+  var moveTrigger = generateTrigger('move');
+  var resizeTrigger = generateTrigger('resize');
+
   if (rAF) {
-    setupMoveListener(generateTrigger('move'));
+    setupRafListeners({
+      move: moveTrigger,
+      resize: resizeTrigger
+    });
   } else {
-    window.addEventListener('scroll', generateTrigger('move'));
+    window.addEventListener('scroll', moveTrigger);
+    window.addEventListener('resize', resizeTrigger);
   }
-  window.addEventListener('resize', generateTrigger('resize', rAF));
   window.addEventListener('unload', generateTrigger('destroy'));
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible') {
