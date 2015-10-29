@@ -11,6 +11,11 @@ var listenerMap = {
   show: []
 };
 
+var cY = 0;
+var cX = 0;
+var cW = 0;
+var cH = 0;
+
 // detect the presence of DOM
 var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
 
@@ -40,15 +45,11 @@ function generateTrigger(key) {
 }
 
 function setupRafListeners(triggers) {
-  var cY = 0;
-  var cX = 0;
-  var cW = window.innerWidth;
-  var cH = window.innerHeight;
   var pollForAF = function pollForAF() {
     var nY = getScrollTop();
     var nX = getScrollLeft();
-    var nH = window.innerWidth;
-    var nW = window.innerHeight;
+    var nW = window.innerWidth;
+    var nH = window.innerHeight;
     if (cY !== nY || cX !== nX) {
       cY = nY;
       cX = nX;
@@ -66,6 +67,8 @@ function setupRafListeners(triggers) {
 
 // Setup native listeners
 if (hasDOM) {
+  cW = window.innerWidth;
+  cH = window.innerHeight;
   var moveTrigger = generateTrigger('move');
   var resizeTrigger = generateTrigger('resize');
 
@@ -75,8 +78,7 @@ if (hasDOM) {
       resize: resizeTrigger
     });
   } else {
-    window.addEventListener('scroll', moveTrigger);
-    window.addEventListener('resize', resizeTrigger);
+    console.error('Venana requires requestAnimationFrame()');
   }
   window.addEventListener('unload', generateTrigger('destroy'));
   document.addEventListener('visibilitychange', function () {
@@ -102,8 +104,8 @@ exports['default'] = {
   },
   mapBoundingRectToAbsolute: function mapBoundingRectToAbsolute(boundingRect) {
     var dimensions = {};
-    dimensions.top = boundingRect.top + getScrollTop();
-    dimensions.left = boundingRect.left + getScrollLeft();
+    dimensions.top = boundingRect.top + cY;
+    dimensions.left = boundingRect.left + cX;
     dimensions.width = boundingRect.width;
     dimensions.height = boundingRect.height;
     return dimensions;
@@ -116,10 +118,10 @@ exports['default'] = {
       bottom: 0
     };
     return {
-      top: getScrollTop() + offset.top,
-      left: getScrollLeft() + offset.left,
-      height: window.innerHeight - offset.top - offset.bottom,
-      width: window.innerWidth - offset.left - offset.right
+      top: cY + offset.top,
+      left: cX + offset.left,
+      height: cH - offset.top - offset.bottom,
+      width: cW - offset.left - offset.right
     };
   }
 };
