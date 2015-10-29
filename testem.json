@@ -1,9 +1,9 @@
 {
   "framework":"qunit",
   "src_files": [
-    "exports/ventana.umd.js",
     "node_modules/sinon/pkg/sinon.js",
-    "tests/**/*.js"
+    "exports/ventana.umd.js",
+    "tests/**/*.test.js"
   ],
   "launch_in_ci": [
     "PhantomJS"

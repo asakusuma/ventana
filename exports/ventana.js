@@ -16,6 +16,18 @@ var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'und
 
 var rAF = hasDOM && window.requestAnimationFrame;
 
+var se = typeof document.scrollingElement !== 'undefined';
+var getScrollTop = se ? function () {
+  return document.scrollingElement.scrollTop;
+} : function () {
+  return window.scrollY;
+};
+var getScrollLeft = se ? function () {
+  return document.scrollingElement.scrollLeft;
+} : function () {
+  return window.scrollX;
+};
+
 function generateTrigger(key) {
   return function () {
     var listeners = listenerMap[key],
@@ -28,13 +40,13 @@ function generateTrigger(key) {
 }
 
 function setupRafListeners(triggers) {
-  var cY = window.pageYOffset;
-  var cX = window.pageXOffset;
+  var cY = 0;
+  var cX = 0;
   var cW = window.innerWidth;
   var cH = window.innerHeight;
   var pollForAF = function pollForAF() {
-    var nY = window.pageYOffset;
-    var nX = window.pageXOffset;
+    var nY = getScrollTop();
+    var nX = getScrollLeft();
     var nH = window.innerWidth;
     var nW = window.innerHeight;
     if (cY !== nY || cX !== nX) {
@@ -90,19 +102,24 @@ exports['default'] = {
   },
   mapBoundingRectToAbsolute: function mapBoundingRectToAbsolute(boundingRect) {
     var dimensions = {};
-    dimensions.top = boundingRect.top + window.scrollY;
-    dimensions.left = boundingRect.left + window.scrollX;
+    dimensions.top = boundingRect.top + getScrollTop();
+    dimensions.left = boundingRect.left + getScrollLeft();
     dimensions.width = boundingRect.width;
     dimensions.height = boundingRect.height;
     return dimensions;
   },
   getWindowRect: function getWindowRect(offset) {
-    offset = offset || {};
+    offset = offset || {
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0
+    };
     return {
-      top: (window.scrollY || window.pageYOffset) + (offset.top ? offset.top : 0),
-      left: (window.scrollX || window.pageXOffset) + (offset.left ? offset.left : 0),
-      height: window.innerHeight - (offset.top ? offset.top : 0) - (offset.bottom ? offset.bottom : 0),
-      width: window.innerWidth - (offset.left ? offset.left : 0) - (offset.right ? offset.right : 0)
+      top: getScrollTop() + offset.top,
+      left: getScrollLeft() + offset.left,
+      height: window.innerHeight - offset.top - offset.bottom,
+      width: window.innerWidth - offset.left - offset.right
     };
   }
 };
