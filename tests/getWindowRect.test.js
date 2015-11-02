@@ -4,7 +4,6 @@ window.scrollX = 100;
 QUnit.module('getWindowRect');
 
 QUnit.test('Returns correct object if no offset is set', function(assert){
-  debugger;
   var result = ventana.getWindowRect();
   assert.equal(result.top, 100, 'top should equal scrolled Y position');
   assert.equal(result.left, 100, 'left should equal scrolled x position');
