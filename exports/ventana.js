@@ -46,7 +46,6 @@ function flushLoopQueue() {
 
 function setupRafListeners(triggers) {
   var pollForAF = function pollForAF() {
-    console.log('Poll');
     var nY = getScrollTop();
     var nX = getScrollLeft();
     var nW = window.innerWidth;
