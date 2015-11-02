@@ -26,6 +26,11 @@ For performance reasons, the move event (aka scroll) is [implemented](https://gi
 
 <hr>
 
+##### `ventana.queue(Function callback)`
+Queue up a function to be called after the next [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) loop completes.
+
+<hr>
+
 ##### `ventana.mapBoundingRectToAbsolute(Object boundingRect)` -> `Object`
 
 The native DOM API exposes a nifty function called [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect), which returns positioning info about a DOM element. However, this info is relative to the viewport. Use **.mapBoundingRectToAbsolute** to map this object with relative position values to an object with absolute position values.

@@ -11,27 +11,19 @@ var listenerMap = {
   show: []
 };
 
+var _queue = [];
+
 var cY = 0;
 var cX = 0;
 var cW = 0;
 var cH = 0;
+var getScrollTop = undefined;
+var getScrollLeft = undefined;
 
 // detect the presence of DOM
 var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
 
 var rAF = hasDOM && window.requestAnimationFrame;
-
-var se = typeof document.scrollingElement !== 'undefined';
-var getScrollTop = se ? function () {
-  return document.scrollingElement.scrollTop;
-} : function () {
-  return window.scrollY;
-};
-var getScrollLeft = se ? function () {
-  return document.scrollingElement.scrollLeft;
-} : function () {
-  return window.scrollX;
-};
 
 function generateTrigger(key) {
   return function () {
@@ -42,6 +34,14 @@ function generateTrigger(key) {
       listeners[i].call(null);
     }
   };
+}
+
+function flushLoopQueue() {
+  var func = _queue.pop();
+  while (func) {
+    func();
+    func = _queue.pop();
+  }
 }
 
 function setupRafListeners(triggers) {
@@ -60,6 +60,7 @@ function setupRafListeners(triggers) {
       cW = nW;
       triggers.resize.call(null);
     }
+    flushLoopQueue();
     rAF(pollForAF);
   };
   rAF(pollForAF);
@@ -67,6 +68,17 @@ function setupRafListeners(triggers) {
 
 // Setup native listeners
 if (hasDOM) {
+  var se = typeof document.scrollingElement !== 'undefined';
+  getScrollTop = se ? function () {
+    return document.scrollingElement.scrollTop;
+  } : function () {
+    return window.scrollY;
+  };
+  getScrollLeft = se ? function () {
+    return document.scrollingElement.scrollLeft;
+  } : function () {
+    return window.scrollX;
+  };
   cW = window.innerWidth;
   cH = window.innerHeight;
   var moveTrigger = generateTrigger('move');
@@ -101,6 +113,9 @@ exports['default'] = {
   },
   off: function off(e, callback) {
     // TODO
+  },
+  queue: function queue(func) {
+    _queue.push(func);
   },
   mapBoundingRectToAbsolute: function mapBoundingRectToAbsolute(boundingRect) {
     var dimensions = {};
