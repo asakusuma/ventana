@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <style>
+      body {
+        font-family: verdana;
+      }
+      .output {
+        padding:30px;
+      }
+
+      #content {
+        width: 600px;
+        margin: auto;
+      }
+
+      .item {
+        border: 1px solid black;
+        margin: 10px;
+        padding: 10px;
+      }
+
+      #scroll {
+        height: 800px;
+        overflow-y: scroll;
+      }
+    </style>
+    <script type="text/javascript" src="../../exports/ventana.js"></script>
+  </head>
+  <body>
+    <h2>Ventana Test App</h2>
+
+    <div id="content">
+      <div id="top-items"></div>
+      <div id="scroll"></div>
+      <div id="bottom-items"></div>
+    </div>
+
+    <script type="text/javascript" src="setup.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+  </body>
+</html>
