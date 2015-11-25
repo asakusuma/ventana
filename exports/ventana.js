@@ -54,17 +54,19 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _streamsScroll) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(1), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _streamsScroll, _streamsResize) {
 	  'use strict';
 
 	  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	  var _scrollStream = _interopRequireDefault(_streamsScroll);
+	  var _scroll = _interopRequireDefault(_streamsScroll);
+
+	  var _resize = _interopRequireDefault(_streamsResize);
 
 	  var ventana = {
 	    init: function init() {},
 	    onScroll: function onScroll(func) {
-	      _scrollStream['default'].listen(func);
+	      _scroll['default'].listen(func);
 	    }
 	    /*
 	    init() {
@@ -83,21 +85,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _raf) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(2), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _raf, _windowProxy) {
 	  'use strict';
 
 	  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	  var _RAF = _interopRequireDefault(_raf);
 
-	  function getScrollTop() {
-	    return document.scrollingElement.scrollTop;
-	  }
-
-	  var scrollPosition = 0;
+	  var scrollPosition = (0, _windowProxy.getScrollTop)();
 
 	  module.exports = _RAF['default'].filter(function (frame) {
-	    var newPos = getScrollTop();
+	    var newPos = (0, _windowProxy.getScrollTop)();
 	    if (newPos !== scrollPosition) {
 	      scrollPosition = newPos;
 	      return {
@@ -112,25 +110,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _stream) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _stream, _windowProxy) {
 	  'use strict';
 
 	  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	  var _Stream = _interopRequireDefault(_stream);
 
-	  var RAF = new _Stream['default']();
-
-	  var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
-	  var rAF = hasDOM && window.requestAnimationFrame;
+	  var RAF = new _Stream['default']('requestAnimationFrame');
 
 	  var pollForAF = function pollForAF() {
 	    RAF.write({
 	      timestamp: Date.now()
 	    });
-	    rAF(pollForAF);
+	    (0, _windowProxy.rAF)(pollForAF);
 	  };
-	  rAF(pollForAF);
+	  (0, _windowProxy.rAF)(pollForAF);
 
 	  module.exports = RAF;
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -147,11 +142,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	  var Stream = (function () {
-	    function Stream() {
+	    function Stream(name) {
 	      _classCallCheck(this, Stream);
 
+	      this.name = name;
 	      this.targets = [];
 	    }
+
+	    /* TODO
+	      - Add queue feature to listen. Allow ordered queues for a stream.
+	    */
 
 	    _createClass(Stream, [{
 	      key: 'write',
@@ -170,6 +170,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.targets.push(target);
 	      }
 	    }, {
+	      key: 'throttle',
+	      value: function throttle() {}
+	    }, {
 	      key: 'filter',
 	      value: function filter(_filter) {
 	        var filteredStream = new Stream();
@@ -181,12 +184,100 @@ return /******/ (function(modules) { // webpackBootstrap
 	        });
 	        return filteredStream;
 	      }
+	    }], [{
+	      key: 'merge',
+	      value: function merge(streams, reduce) {
+	        //for ()
+	      }
 	    }]);
 
 	    return Stream;
 	  })();
 
 	  module.exports = Stream;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports) {
+	  // detect the presence of DOM
+	  'use strict';
+
+	  Object.defineProperty(exports, '__esModule', {
+	    value: true
+	  });
+	  var hasDOM = typeof window !== 'undefined' && window && typeof document !== 'undefined' && document;
+	  var rAF = hasDOM && window.requestAnimationFrame;
+
+	  var getScrollTop, getScrollLeft, getHeight, getWidth;
+	  exports.getScrollTop = getScrollTop = exports.getScrollLeft = getScrollLeft = exports.getHeight = getHeight = exports.getWidth = getWidth = function () {
+	    return 0;
+	  };
+
+	  function hasDomSetup() {
+	    var se = typeof document.scrollingElement !== 'undefined';
+	    exports.getScrollTop = getScrollTop = se ? function () {
+	      return document.scrollingElement.scrollTop;
+	    } : function () {
+	      return window.scrollY;
+	    };
+	    exports.getScrollLeft = getScrollLeft = se ? function () {
+	      return document.scrollingElement.scrollLeft;
+	    } : function () {
+	      return window.scrollX;
+	    };
+	    exports.getHeight = getHeight = function () {
+	      return window.innerWidth;
+	    };
+	    exports.getWidth = getWidth = function () {
+	      return window.innerHeight;
+	    };
+	  }
+
+	  if (hasDOM) {
+	    document.addEventListener('DOMContentLoaded', hasDomSetup);
+	  }
+
+	  var getScrollTop;
+	  exports.getScrollTop = getScrollTop;
+	  var getScrollLeft;
+	  exports.getScrollLeft = getScrollLeft;
+	  var getWidth;
+	  exports.getWidth = getWidth;
+	  var getHeight;
+	  exports.getHeight = getHeight;
+	  var rAF;
+	  exports.rAF = rAF;
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, module, __webpack_require__(2), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, module, _raf, _windowProxy) {
+	  'use strict';
+
+	  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	  var _RAF = _interopRequireDefault(_raf);
+
+	  var h = (0, _windowProxy.getHeight)();
+	  var w = (0, _windowProxy.getWidth)();
+
+	  module.exports = _RAF['default'].filter(function (frame) {
+	    var nH = (0, _windowProxy.getHeight)();
+	    var nW = (0, _windowProxy.getWidth)();
+	    if (nW !== w || nH !== h) {
+	      h = nH;
+	      w = nW;
+	      return {
+	        width: w,
+	        height: h
+	      };
+	    }
+	  });
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 /***/ }
