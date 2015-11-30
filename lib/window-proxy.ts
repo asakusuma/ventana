@@ -1,27 +1,26 @@
 // detect the presence of DOM
 let hasDOM = (typeof window !== 'undefined') && window
     && (typeof document !== 'undefined') && document;
-var rAF = hasDOM && (<any>window).requestAnimationFrame;
+var nop = () => 0;
+var W = {};
+W.getScrollTop = W.getScrollLeft = W.getHeight = W.getWidth = nop;
 
-var getScrollTop, getScrollLeft, getHeight, getWidth;
-getScrollTop = getScrollLeft = getHeight = getWidth = () => 0;
+W.rAF = hasDOM && (<any>window).requestAnimationFrame.bind(window);
 
 function hasDomSetup() {
   let se = typeof (<any>document).scrollingElement !== 'undefined';
-  getScrollTop = se ? () => (<any>document).scrollingElement.scrollTop : () => (<any>window).scrollY;
-  getScrollLeft = se ? () => (<any>document).scrollingElement.scrollLeft : () => (<any>window).scrollX;
-  getHeight = () => (<any>window).innerWidth;
-  getWidth = () => (<any>window).innerHeight;
+  W.getScrollTop = se ? () => (<any>document).scrollingElement.scrollTop : () => (<any>window).scrollY;
+  W.getScrollLeft = se ? () => (<any>document).scrollingElement.scrollLeft : () => (<any>window).scrollX;
+  W.getHeight = () => (<any>window).innerWidth;
+  W.getWidth = () => (<any>window).innerHeight;
 }
 
 if (hasDOM) {
-  (<any>document).addEventListener('DOMContentLoaded', hasDomSetup);
+  if ((<any>document).readyState !== 'loading') {
+    hasDomSetup();
+  } else {
+    (<any>document).addEventListener('DOMContentLoaded', hasDomSetup);
+  }
 }
 
-export {
-  getScrollTop,
-  getScrollLeft,
-  getWidth,
-  getHeight,
-  rAF
-};
+export default W;

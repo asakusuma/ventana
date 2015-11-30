@@ -11,4 +11,9 @@ var scriptTree = esTranspiler(typescript, {
   moduleIds: true
 });
 
-module.exports = bundle([scriptTree]);
+var amd = new Funnel(typescript, {
+  destDir: 'amd'
+});
+
+module.exports = merge([bundle([typescript]), amd]);
+//module.exports = typescript;

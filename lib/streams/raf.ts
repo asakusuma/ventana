@@ -1,16 +1,15 @@
 import Stream from './stream';
-import { rAF } from './../window-proxy';
-
-let RAF = new Stream('requestAnimationFrame');
+import rafPhase from './raf-phase';
+import W from './../window-proxy';
 
 class RAFStream extends Stream {
   write (timestamp: number) {
     let measure = {
-      MEASURE: true,
+      phase: rafPhase.MEASURE,
       timestamp
     };
     let mutate = {
-      MUTATE: true,
+      phasee: rafPhase.MUTATE,
       timestamp
     };
     super.write(measure);
@@ -18,10 +17,12 @@ class RAFStream extends Stream {
   }
 }
 
+let RAF = new RAFStream('requestAnimationFrame');
+
 let pollForAF = () => {
   RAF.write(Date.now());
-  rAF(pollForAF);
+  W.rAF(pollForAF);
 }
-rAF(pollForAF);
+W.rAF(pollForAF);
 
 export default RAF;

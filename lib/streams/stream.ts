@@ -1,11 +1,11 @@
 class Stream {
   name: string;
-  targets: Array<any>;
+  targets: Array<Stream | Function>;
   constructor (name = 'anonymous') {
     this.name = name;
     this.targets = [];
   }
-  write(value) {
+  write(value: any) {
     this.targets.forEach(target => {
       if (target instanceof Stream) {
         target.write(value);
@@ -14,24 +14,21 @@ class Stream {
       }
     });
   }
-  listen(target) {
+  listen(target: Stream | Function) {
     this.targets.push(target);
   }
   throttle() {
 
   }
-  filter(filter) {
+  filter(filter: Function) {
     let filteredStream = new Stream();
-    this.listen(value => {
+    this.listen((value: any) => {
       let filtered = filter(value);
       if (filtered) {
         filteredStream.write(filtered);
       }
     });
     return filteredStream;
-  }
-  static merge(streams, reduce) {
-    //for ()
   }
 }
 

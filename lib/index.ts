@@ -4,7 +4,7 @@ import resize from './streams/resize';
 
 let ventana = {
   init() {},
-  onScroll(func) {
+  onScroll(func: Function) {
     scroll.listen(func);
   }
   /*
