@@ -1,4 +1,6 @@
 class Queue {
+  name: string;
+  items: Array<any>;
   constructor(name) {
     this.name = name;
     this.items = [];

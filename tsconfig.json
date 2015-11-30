@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": false
+  },
+  "filesGlob": [
+    "./lib/**/*.ts"
+  ],
+  "files": [
+    "./lib/index.ts",
+    "./lib/queue.ts",
+    "./lib/streams/raf.ts",
+    "./lib/streams/resize.ts",
+    "./lib/streams/scroll.ts",
+    "./lib/streams/stream.ts",
+    "./lib/window-proxy.ts"
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  },
+  "compileOnSave": false
+}
