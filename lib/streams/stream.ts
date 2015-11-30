@@ -1,5 +1,7 @@
 class Stream {
-  constructor (name) {
+  name: string;
+  targets: Array<any>;
+  constructor (name = 'anonymous') {
     this.name = name;
     this.targets = [];
   }

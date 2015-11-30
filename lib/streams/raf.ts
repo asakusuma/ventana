@@ -4,7 +4,7 @@ import { rAF } from './../window-proxy';
 let RAF = new Stream('requestAnimationFrame');
 
 class RAFStream extends Stream {
-  write (timestamp) {
+  write (timestamp: number) {
     let measure = {
       MEASURE: true,
       timestamp
