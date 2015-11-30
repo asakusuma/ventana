@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "noImplicitAny": false,
+    "target": "es5",
+    "module": "amd",
+    "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "sourceMap": false
   },
   "filesGlob": [
@@ -11,7 +14,10 @@
   ],
   "files": [
     "./lib/index.ts",
-    "./lib/queue.ts",
+    "./lib/queues/element.ts",
+    "./lib/queues/queue.ts",
+    "./lib/streams/raf-phase.ts",
+    "./lib/streams/raf-result.ts",
     "./lib/streams/raf.ts",
     "./lib/streams/resize.ts",
     "./lib/streams/scroll.ts",

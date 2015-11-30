@@ -1,10 +1,10 @@
 import RAF from './raf';
-import { getScrollTop } from './../window-proxy';
+import W from './../window-proxy';
 
-let scrollPosition = getScrollTop();
+let scrollPosition = W.getScrollTop();
 
-export default RAF.filter((frame) => {
-  let newPos = getScrollTop();
+export default RAF.filter((frame: any) => {
+  let newPos = W.getScrollTop();
   if (newPos !== scrollPosition) {
     scrollPosition = newPos;
     return {
