@@ -2,6 +2,7 @@ var Funnel = require('broccoli-funnel');
 var bundle = require('./bundler');
 var esTranspiler = require('broccoli-babel-transpiler');
 var merge = require('broccoli-merge-trees');
+var uglify = require('broccoli-uglify-js');
 var tsTranspiler = require('broccoli-typescript-compiler');
 
 var inputTree = 'lib';
@@ -15,5 +16,5 @@ var amd = new Funnel(typescript, {
   destDir: 'amd'
 });
 
-module.exports = merge([bundle([typescript]), amd]);
+module.exports = merge([uglify(bundle([typescript])), amd]);
 //module.exports = typescript;
