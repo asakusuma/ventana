@@ -12,10 +12,16 @@ function generateItem(index) {
   return item;
 }
 
+var items = [];
+
 var i = 1;
 for (; i <= 8; i++) {
   var item = generateItem(i);
   document.getElementById('top-items').appendChild(item);
+  items.push({
+    id: i,
+    el: item
+  });
 }
 for (; i <= 16; i++) {
   var item = generateItem(i);

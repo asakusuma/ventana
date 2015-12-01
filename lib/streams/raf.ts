@@ -5,14 +5,12 @@ import W from './../window-proxy';
 
 class RAFStream extends Stream {
   write (timestamp: number) {
-    let frame:Frame = {
-      phase: Frame.PHASE.MEASURE,
-      timestamp,
-      scrollTop: W.getScrollTop(),
-      scrollLeft: W.getScrollLeft(),
-      width: W.getWidth(),
-      height: W.getHeight()
-    };
+    let frame = new Frame();
+    frame.phase = Frame.PHASE.MEASURE;
+    frame.scrollTop = W.getScrollTop();
+    frame.scrollLeft = W.getScrollLeft();
+    frame.width = W.getWidth();
+    frame.height = W.getHeight();
 
     super.write(frame);
     frame.phase = Frame.PHASE.MUTATE
