@@ -4,12 +4,17 @@ import Frame from './streams/frame';
 import Queue from './queues/queue';
 import Element from './queues/element';
 
+// Queue of viewport tracked dom element
 let viewportQueue = new Queue('Viewport', (frame: Frame, element: Element) => {
   if (frame.isMeasure()) {
     element.bcr = element.el.getBoundingClientRect();
   } else {
     let bcr = element.bcr;
-    let inViewport = bcr.top < frame.height && bcr.top + bcr.height > 0;
+    let inViewport = bcr.top < frame.height &&
+      bcr.top + bcr.height > 0 &&
+      bcr.left < frame.width &&
+      bcr.left + bcr.width > 0;
+
     if (!element.inViewport && inViewport) {
       element.callback();
     }
