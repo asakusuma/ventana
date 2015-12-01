@@ -1,18 +1,14 @@
 import raf from './../streams/raf';
-import Frame from './../streams/frame';
 import RAFQueue from './../queues/raf-queue';
-import Element from './../queues/element';
+import QueueElement from './../queues/element';
 
-class ViewportElement implements Element {
-  el: Object;
-  callback: Function;
-  id: string;
-  bcr: ClientRect;
+class ViewportElement extends QueueElement {
   inViewport: Boolean;
-  constructor(id: string, el: Object, callback: Function) {
+  constructor(id: string, el: Element, callback: Function) {
     this.id = id;
     this.el = el;
     this.callback = callback;
+    super();
   }
 }
 
@@ -31,7 +27,7 @@ let viewportQueue = new RAFQueue('Viewport', (frame: Frame, el: ViewportElement)
 
 raf.listen(viewportQueue);
 
-export default function(id: string, el: Object, callback: Function) {
+export default function(id: string, el: Element, callback: Function) {
   let element = new ViewportElement(id, el, callback);
   viewportQueue.push(element);
 };

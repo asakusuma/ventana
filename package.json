@@ -37,8 +37,9 @@
   },
   "scripts": {
     "watch": "broccoli-timepiece exports/",
-    "build": "rm -rf exports && broccoli build exports",
+    "build": "rm -rf exports && broccoli build exports && npm run stats",
+    "tsc": "rm -rf exports/amd && tsc",
     "stats": "node size-calc",
-    "test": "testem ci"
+    "test": "npm run tsc"
   }
 }

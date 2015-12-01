@@ -1,11 +1,10 @@
 import RAF from './raf';
-import Frame from './frame';
 
 let w = -1;
 let h = -1;
 
 export default RAF.filter((frame: Frame) => {
-  if (frame.phase === Frame.PHASE.MEASURE) {
+  if (frame.phase === RAFPhase.MEASURE) {
     let nH = frame.height;
     let nW = frame.width;
     if (nW !== w || nH !== h) {

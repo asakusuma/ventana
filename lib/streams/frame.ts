@@ -4,8 +4,6 @@ enum RAFPhase {
 }
 
 class Frame {
-  static PHASE = RAFPhase;
-
   phase: RAFPhase;
   timestamp: number;
   scrollTop: number;
@@ -17,5 +15,3 @@ class Frame {
     return this.phase === RAFPhase.MEASURE;
   }
 }
-
-export default Frame;
