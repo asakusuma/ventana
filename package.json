@@ -25,6 +25,8 @@
     "gzip-size": "^3.0.0",
     "pretty-bytes": "^2.0.1",
     "express": "^4.13.3",
+    "gzip-size": "^3.0.0",
+    "pretty-bytes": "^2.0.1",
     "rsvp": "^3.1.0",
     "serve-static": "^1.10.0",
     "sinon": "^1.17.2",
