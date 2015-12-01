@@ -1,25 +1,20 @@
 import scroll from './streams/scroll';
 import raf from './streams/raf';
 import Frame from './streams/frame';
-import Queue from './queues/queue';
+import RAFQueue from './queues/raf-queue';
 import Element from './queues/element';
 
 // Queue of viewport tracked dom element
-let viewportQueue = new Queue('Viewport', (frame: Frame, element: Element) => {
-  if (frame.isMeasure()) {
-    element.bcr = element.el.getBoundingClientRect();
-  } else {
-    let bcr = element.bcr;
-    let inViewport = bcr.top < frame.height &&
-      bcr.top + bcr.height > 0 &&
-      bcr.left < frame.width &&
-      bcr.left + bcr.width > 0;
+let viewportQueue = new RAFQueue('Viewport', (frame: Frame, el: Element) => {
+  let inViewport = el.bcr.top < frame.height &&
+    el.bcr.top + el.bcr.height > 0 &&
+    el.bcr.left < frame.width &&
+    el.bcr.left + el.bcr.width > 0;
 
-    if (!element.inViewport && inViewport) {
-      element.callback();
-    }
-    element.inViewport = inViewport;
+  if (!el.inViewport && inViewport) {
+    el.callback();
   }
+  el.inViewport = inViewport;
 });
 
 raf.listen(viewportQueue);

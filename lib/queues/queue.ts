@@ -13,9 +13,14 @@ class Queue {
     this.items.push(element);
   }
   tap(value: any) {
-    this.items.forEach((element) => {
-      this.collect(value, element);
+    this.items.forEach((element: QueueElement) => {
+      if (!this.intercept(value, element)) {
+        this.collect(value, element);
+      }
     });
+  },
+  intercept() {
+    return false;
   }
 }
 
