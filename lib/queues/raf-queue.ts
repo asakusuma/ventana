@@ -1,6 +1,5 @@
 import Element from './element';
 import Queue from './queue';
-import Frame from './../streams/frame';
 
 class RAFQueue extends Queue {
   intercept(frame: Frame, element: Element) {

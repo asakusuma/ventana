@@ -1,12 +1,5 @@
-interface ClientRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
-
-interface QueueElement {
-  el: Object;
+class QueueElement {
+  el: Element;
   callback: Function;
   id: string;
   bcr: ClientRect;

@@ -7,7 +7,9 @@
     "preserveConstEnums": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "sourceMap": false
+    "sourceMap": false,
+    "isolatedModules": false,
+    "outDir": "exports/amd"
   },
   "filesGlob": [
     "./lib/**/*.ts"

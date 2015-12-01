@@ -13,7 +13,7 @@ class Stream {
       } else if (target instanceof Queue) {
         target.tap(value);
       } else if (typeof target === 'function') {
-        target(value);
+        (<Function>target)(value);
       }
     });
   }
