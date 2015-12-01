@@ -35,8 +35,4 @@ class Stream {
   }
 }
 
-/* TODO
-  - Add queue feature to listen. Allow ordered queues for a stream.
-*/
-
 export default Stream;
