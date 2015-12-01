@@ -2,7 +2,7 @@
 let hasDOM = (typeof window !== 'undefined') && window
     && (typeof document !== 'undefined') && document;
 var nop = () => 0;
-var W = {};
+var W: any = {};
 W.getScrollTop = W.getScrollLeft = W.getHeight = W.getWidth = nop;
 
 W.rAF = hasDOM && (<any>window).requestAnimationFrame.bind(window);

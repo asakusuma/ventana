@@ -18,8 +18,8 @@ class Queue {
         this.collect(value, element);
       }
     });
-  },
-  intercept() {
+  }
+  intercept(value: any, element:QueueElement) {
     return false;
   }
 }

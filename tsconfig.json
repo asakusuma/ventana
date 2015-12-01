@@ -13,11 +13,12 @@
     "./lib/**/*.ts"
   ],
   "files": [
+    "./lib/implementations/viewport.ts",
     "./lib/index.ts",
     "./lib/queues/element.ts",
     "./lib/queues/queue.ts",
-    "./lib/streams/raf-phase.ts",
-    "./lib/streams/raf-result.ts",
+    "./lib/queues/raf-queue.ts",
+    "./lib/streams/frame.ts",
     "./lib/streams/raf.ts",
     "./lib/streams/resize.ts",
     "./lib/streams/scroll.ts",
