@@ -29,7 +29,7 @@
     "serve-static": "^1.10.0",
     "sinon": "^1.17.2",
     "testem": "^0.9.8",
-    "typescript": "^1.6.2",
+    "typescript": "^1.7.3",
     "webpack": "^1.12.9"
   },
   "engines": {
