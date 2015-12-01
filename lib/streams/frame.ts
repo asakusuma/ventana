@@ -12,6 +12,10 @@ class Frame {
   scrollLeft: number;
   width: number;
   height: number;
+
+  isMeasure() {
+    return this.phase === RAFPhase.MEASURE;
+  }
 }
 
 export default Frame;

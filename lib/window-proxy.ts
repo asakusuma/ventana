@@ -11,8 +11,8 @@ function hasDomSetup() {
   let se = typeof (<any>document).scrollingElement !== 'undefined';
   W.getScrollTop = se ? () => (<any>document).scrollingElement.scrollTop : () => (<any>window).scrollY;
   W.getScrollLeft = se ? () => (<any>document).scrollingElement.scrollLeft : () => (<any>window).scrollX;
-  W.getHeight = () => (<any>window).innerWidth;
-  W.getWidth = () => (<any>window).innerHeight;
+  W.getHeight = () => (<any>window).innerHeight;
+  W.getWidth = () => (<any>window).innerWidth;
 }
 
 if (hasDOM) {

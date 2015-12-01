@@ -1,6 +1,5 @@
 import RAF from './raf';
 import Frame from './frame';
-import W from './../window-proxy';
 
 let scrollPosition = -1;
 

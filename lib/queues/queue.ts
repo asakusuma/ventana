@@ -3,15 +3,19 @@ import QueueElement from './element';
 class Queue {
   name: string;
   items: Array<QueueElement>;
-  constructor(name: string) {
+  collect: Function;
+  constructor(name: string, collect: Function) {
     this.name = name;
     this.items = [];
+    this.collect = collect;
   }
   push(element: QueueElement) {
     this.items.push(element);
   }
-  forEach(func: Function) {
-    this.items.forEach(func);
+  tap(value: any) {
+    this.items.forEach((element) => {
+      this.collect(value, element);
+    });
   }
 }
 

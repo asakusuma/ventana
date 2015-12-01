@@ -1,3 +1,4 @@
+import Queue from './../queues/queue';
 class Stream {
   name: string;
   targets: Array<Stream | Function>;
@@ -9,12 +10,14 @@ class Stream {
     this.targets.forEach(target => {
       if (target instanceof Stream) {
         target.write(value);
+      } else if (target instanceof Queue) {
+        target.tap(value);
       } else if (typeof target === 'function') {
         target(value);
       }
     });
   }
-  listen(target: Stream | Function) {
+  listen(target: Stream | Queue | Function) {
     this.targets.push(target);
   }
   throttle() {
