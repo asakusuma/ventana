@@ -1,6 +1,5 @@
 import Stream from './stream';
 import Frame from './frame';
-import RAFResult from './raf-result';
 import W from './../window-proxy';
 
 class RAFStream extends Stream {

@@ -1,13 +1,13 @@
 import Queue from './../queues/queue';
 class Stream {
   name: string;
-  targets: Array<Stream | Function>;
+  targets: Array<Stream | Queue | Function>;
   constructor (name = 'anonymous') {
     this.name = name;
     this.targets = [];
   }
   write(value: any) {
-    this.targets.forEach(target => {
+    this.targets.forEach(function(target: Stream | Queue | Function) {
       if (target instanceof Stream) {
         target.write(value);
       } else if (target instanceof Queue) {
