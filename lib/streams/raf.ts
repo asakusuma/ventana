@@ -1,19 +1,22 @@
 import Stream from './stream';
-import rafPhase from './raf-phase';
+import Frame from './frame';
+import RAFResult from './raf-result';
 import W from './../window-proxy';
 
 class RAFStream extends Stream {
   write (timestamp: number) {
-    let measure = {
-      phase: rafPhase.MEASURE,
-      timestamp
+    let frame:Frame = {
+      phase: Frame.PHASE.MEASURE,
+      timestamp,
+      scrollTop: W.getScrollTop(),
+      scrollLeft: W.getScrollLeft(),
+      width: W.getWidth(),
+      height: W.getHeight()
     };
-    let mutate = {
-      phasee: rafPhase.MUTATE,
-      timestamp
-    };
-    super.write(measure);
-    super.write(mutate);
+
+    super.write(frame);
+    frame.phase = Frame.PHASE.MUTATE
+    super.write(frame);
   }
 }
 

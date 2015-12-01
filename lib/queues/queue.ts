@@ -10,6 +10,9 @@ class Queue {
   push(element: QueueElement) {
     this.items.push(element);
   }
+  forEach(func: Function) {
+    this.items.forEach(func);
+  }
 }
 
 export default Queue;
