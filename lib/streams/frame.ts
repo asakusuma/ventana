@@ -15,3 +15,8 @@ class Frame {
     return this.phase === RAFPhase.MEASURE;
   }
 }
+
+export {
+  Frame,
+  RAFPhase
+};

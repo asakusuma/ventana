@@ -1,4 +1,5 @@
 import RAF from './raf';
+import { Frame, RAFPhase } from './frame';
 
 let scrollPosition = -1;
 

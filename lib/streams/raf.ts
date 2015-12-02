@@ -1,5 +1,6 @@
 import Stream from './stream';
 import W from './../window-proxy';
+import { Frame, RAFPhase } from './frame';
 
 class RAFStream extends Stream {
   write (timestamp: number) {
