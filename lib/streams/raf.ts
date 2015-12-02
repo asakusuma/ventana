@@ -17,12 +17,28 @@ class RAFStream extends Stream {
   }
 }
 
-let RAF = new RAFStream('requestAnimationFrame');
+let raf = new RAFStream('requestAnimationFrame');
+
+let measure = raf.filter((frame: Frame) => {
+  if (frame.phase === RAFPhase.MEASURE) {
+    return frame;
+  }
+});
+
+let poll = raf.filter((frame: Frame) => {
+  if (frame.phase !== RAFPhase.MEASURE) {
+    return frame;
+  }
+});
 
 let pollForAF = () => {
-  RAF.write(Date.now());
+  raf.write(Date.now());
   W.rAF(pollForAF);
 }
 W.rAF(pollForAF);
 
-export default RAF;
+export {
+  raf,
+  measure,
+  poll
+};
