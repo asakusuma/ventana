@@ -16,5 +16,9 @@ var amd = new Funnel(typescript, {
   destDir: 'amd'
 });
 
-module.exports = merge([uglify(bundle([typescript])), amd]);
-//module.exports = typescript;
+var prod = uglify(bundle([typescript]), {
+  mangle: true,
+  compress: true
+});
+
+module.exports = merge([prod, amd]);
