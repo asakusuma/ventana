@@ -7,6 +7,16 @@ ventana.on('hide', function() {
 });
 ```
 
+## How it works
+
+Under the hood, there are two main abstractions used to implement Ventana: streams and queues.
+
+#### Streams
+Ventana streams are barebones, essentially just a list of listeners with the ability to filter on values and work nicely with queues. Listeners can be functions, other streams, or queues. You write a single value to the stream, and each listener gets called with that value.
+
+#### Queues
+Ventana queues are specialized lists of objects.
+
 ## Usage
 Ventana is available as a [standard npm module](https://www.npmjs.com/package/ventana). Additionally, you can use the [minified UMD file](https://github.com/asakusuma/ventana/blob/master/exports/ventana.umd.js).
 
