@@ -1,4 +1,4 @@
-import raf from './../streams/raf';
+import { raf } from './../streams/raf';
 import RAFQueue from './../queues/raf-queue';
 import QueueElement from './../queues/element';
 import { Frame, RAFPhase } from './../streams/frame';
