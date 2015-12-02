@@ -1,4 +1,5 @@
 import RAF from './raf';
+import { Frame, RAFPhase } from './frame';
 
 let w = -1;
 let h = -1;
