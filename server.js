@@ -11,3 +11,4 @@ var app = express()
 app.use(serveStatic(__dirname + '/exports'))
 app.use(serveStatic(__dirname + '/tests/app'))
 app.listen(3000)
+console.log('Serving on localhost:3000');

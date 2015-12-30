@@ -17,15 +17,26 @@ class Stream {
       }
     });
   }
-  listen(target: Stream | Queue | Function) {
+  pipe(target: Stream | Queue | Function) {
     this.targets.push(target);
   }
   throttle() {
 
   }
+
+  /**
+   * Returns a new stream. The new stream's behavior is defined by the
+   * original stream and the filter function. Values from the original
+   * stream are passed into the filter function, and if the filter
+   * function returns a truthy value, the value is passed onto the new
+   * stream.
+   *
+   * @param {Function} filter - The filter function
+   * @returns {Stream} - The generates stream
+   */
   filter(filter: Function) {
     let filteredStream = new Stream();
-    this.listen((value: any) => {
+    this.pipe((value: any) => {
       let filtered = filter(value);
       if (filtered) {
         filteredStream.write(filtered);

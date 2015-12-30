@@ -5,7 +5,7 @@ import onViewport from './implementations/viewport';
 let ventana = {
   init() {},
   onScroll(func: Function) {
-    scroll.listen(func);
+    scroll.pipe(func);
   },
   onViewport
 };
