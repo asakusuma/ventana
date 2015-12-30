@@ -26,7 +26,7 @@ let viewportQueue = new RAFQueue('Viewport', (frame: Frame, el: ViewportElement)
   el.inViewport = inViewport;
 });
 
-raf.listen(viewportQueue);
+raf.pipe(viewportQueue);
 
 export default function(id: string, el: Element, callback: Function) {
   let element = new ViewportElement(id, el, callback);

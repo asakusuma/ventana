@@ -2,20 +2,10 @@
 Window event microlibrary. Exposes a pretty API for window events and utilities.
 
 ```JavaScript
-ventana.on('hide', function() {
-  console.log('User hid the current tab');
+ventana.on('scroll', function() {
+  console.log('User scrolled');
 });
 ```
-
-## How it works
-
-Under the hood, there are two main abstractions used to implement Ventana: streams and queues.
-
-#### Streams
-Ventana streams are barebones, essentially just a list of listeners with the ability to filter on values and work nicely with queues. Listeners can be functions, other streams, or queues. You write a single value to the stream, and each listener gets called with that value.
-
-#### Queues
-Ventana queues are specialized lists of objects.
 
 ## Usage
 Ventana is available as a [standard npm module](https://www.npmjs.com/package/ventana). Additionally, you can use the [minified UMD file](https://github.com/asakusuma/ventana/blob/master/exports/ventana.umd.js).
@@ -50,3 +40,13 @@ The native DOM API exposes a nifty function called [Element.getBoundingClientRec
 ##### `ventana.getWindowRect(Object offset)` -> `Object`
 
 Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport. You can pass an offset object that expects any combination of the following properties: top, left, bottom, right.
+
+## How it works
+
+Under the hood, there are two main abstractions used to implement Ventana: streams and queues.
+
+#### Streams
+Ventana streams are barebones, essentially just lists of listeners with the ability to filter on values and work nicely with queues. Listeners can be functions, other streams, or queues. You write a single value to the stream, and each listener gets called with that value. Streams are used to represent a single type of repeatable event, like the user scrolling or the window being re-sized. In the later case, the value being passed by the stream could be the updated dimensions of the window.
+
+#### Queues
+Ventana queues represent a set of objects that can receive a stream of values, i.e. a Stream. Queues are usually an abstraction above a paired stream. For instance, a queue can represent a list of DOM objects that need to be modified when the user scrolls. In this example, a stream representing scroll events could be piped into the queue representing the DOM objects.
