@@ -8,7 +8,8 @@ express.static.mime.define({
 
 var app = express()
 
-app.use(serveStatic(__dirname + '/exports'))
-app.use(serveStatic(__dirname + '/tests/app'))
+app.use('/', serveStatic(__dirname + '/exports'))
+app.use('/', serveStatic(__dirname + '/tests/app'))
+app.use('/amd/consumers', serveStatic(__dirname + '/tests/consumers'))
 app.listen(3000)
 console.log('Serving on localhost:3000');
