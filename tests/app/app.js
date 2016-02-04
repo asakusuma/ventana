@@ -5,8 +5,7 @@ requirejs.config({
     }
 });
 
-requirejs(["ventana"], function(ventana) {
-  ventana = ventana['default'];
+requirejs(["ventana", "consumers/combination"], function(ventana, combination) {
   items.forEach(item => {
     ventana.onViewport(item.id, item.el, () => {
       console.log(item.id + ' In Da House');

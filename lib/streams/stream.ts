@@ -2,12 +2,19 @@ import Queue from './../queues/queue';
 class Stream {
   name: string;
   targets: Array<Stream | Queue | Function>;
-  constructor (name = 'anonymous') {
+  constructor (source?: (write: Function) => void | String, name = 'anonymous') {
     this.name = name;
+    if (typeof source === 'function') {
+      source.call(this, (...args:any[]) => {
+        this.write.apply(this, args);
+      });
+    } else if (typeof source === 'string') {
+      this.name = source;
+    }
     this.targets = [];
   }
   write(value: any) {
-    this.targets.forEach(function(target: Stream | Queue | Function) {
+    this.targets.forEach((target: Stream | Queue | Function) => {
       if (target instanceof Stream) {
         target.write(value);
       } else if (target instanceof Queue) {
@@ -20,8 +27,28 @@ class Stream {
   pipe(target: Stream | Queue | Function) {
     this.targets.push(target);
   }
-  throttle() {
 
+  /**
+   * Returns a stream. The resulting stream's behavior is defined by
+   * the supplied streams. Given N streams passed in as arguments,
+   * the resulting stream will recieve Array values of length N.
+   * Values will be written any time any source stream has a new
+   * value. Each value in the resulting stream value array
+   * is the latest value from the corresponding argument stream.
+   *
+   * @param {...Stream} args - Any number of streams
+   * @returns {Stream} - The generated stream
+   */
+  static join(...args: Stream[]) {
+    let cache:any[] = new Array(args.length);
+    return new Stream(function (write: Function) {
+      args.forEach((stream, i) => {
+        stream.pipe((value: any) => {
+          cache[i] = value;
+          this.write(cache);
+        });
+      });
+    });
   }
 
   /**
@@ -32,7 +59,7 @@ class Stream {
    * stream.
    *
    * @param {Function} filter - The filter function
-   * @returns {Stream} - The generates stream
+   * @returns {Stream} - The filtered stream
    */
   filter(filter: Function) {
     let filteredStream = new Stream();
