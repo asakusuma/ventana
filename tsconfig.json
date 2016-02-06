@@ -17,6 +17,7 @@
   "files": [
     "./lib/implementations/viewport.ts",
     "./lib/index.ts",
+    "./lib/interfaces.ts",
     "./lib/queues/element.ts",
     "./lib/queues/queue.ts",
     "./lib/queues/raf-queue.ts",

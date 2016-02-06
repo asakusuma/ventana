@@ -3,3 +3,4 @@ npm-debug.log
 tmp
 exports/amd
 old-lib
+tests/consumers/local
