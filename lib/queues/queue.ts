@@ -1,16 +1,27 @@
-import QueueElement from './element';
+import Stream from '../streams/stream';
+import {
+  StreamInterface,
+  QueueInterface,
+  QueueElementInterface
+} from './../interfaces';
 
-class Queue {
+class Queue implements QueueInterface {
   name: string;
-  items: Array<QueueElement>;
+  items: Array<QueueElementInterface>;
   collect: Function;
+  stream: Stream;
   constructor(name: string, collect: Function) {
     this.name = name;
     this.items = [];
     this.collect = collect;
+    this.stream = new Stream(name + ' output stream');
   }
-  push(element: QueueElement) {
+  push(element: QueueElementInterface) {
     this.items.push(element);
+  }
+
+  toStream() {
+    return this.stream;
   }
 
   /**
@@ -20,24 +31,27 @@ class Queue {
    * @returns {Object} - Object with percent hidden properties
    */
   tap(value: any) {
-    this.items.forEach((element: QueueElement) => {
+    this.items.forEach((element: QueueElementInterface) => {
       if (!this.intercept(value, element)) {
-        this.collect(value, element);
+        let result = this.collect(value, element);
+        if (result) {
+          this.stream.write(result);
+        }
       }
     });
   }
 
   /**
    * Override to specify a function that can prevent individual queue
-   * items from being tapped. Return true if a given value, QueueElement
+   * items from being tapped. Return true if a given value, QueueElementInterface
    * combination should not get tapped.
    *
    * @param {Any} value - The value being tapped into the queue
-   * @param {QueueElement} element - The element about to be tapped
+   * @param {QueueElementInterface} element - The element about to be tapped
    * @returns {Boolean} - Should be true if value/element pair shouldn't
    * be tapped
    */
-  intercept(value: any, element:QueueElement) {
+  intercept(value: any, element:QueueElementInterface) {
     return false;
   }
 }

@@ -1,8 +1,9 @@
-import Queue from './../queues/queue';
-class Stream {
+import { StreamInterface, QueueInterface } from './../interfaces';
+
+class Stream implements StreamInterface {
   name: string;
-  targets: Array<Stream | Queue | Function>;
-  constructor (source?: (write: Function) => void | String, name = 'anonymous') {
+  targets: Array<Stream | QueueInterface | Function>;
+  constructor (source?:string|((write: Function) => void)) {
     this.name = name;
     if (typeof source === 'function') {
       source.call(this, (...args:any[]) => {
@@ -14,18 +15,19 @@ class Stream {
     this.targets = [];
   }
   write(value: any) {
-    this.targets.forEach((target: Stream | Queue | Function) => {
+    this.targets.forEach((target: any) => {
       if (target instanceof Stream) {
         target.write(value);
-      } else if (target instanceof Queue) {
-        target.tap(value);
       } else if (typeof target === 'function') {
         (<Function>target)(value);
+      } else if (typeof target.tap === 'function') {
+        target.tap(value);
       }
     });
   }
-  pipe(target: Stream | Queue | Function) {
+  pipe(target: Stream | QueueInterface | Function) {
     this.targets.push(target);
+    return target;
   }
 
   /**
@@ -61,16 +63,36 @@ class Stream {
    * @param {Function} filter - The filter function
    * @returns {Stream} - The filtered stream
    */
-  filter(filter: Function) {
-    let filteredStream = new Stream();
-    this.pipe((value: any) => {
-      let filtered = filter(value);
-      if (filtered) {
-        filteredStream.write(filtered);
-      }
+  filter(first: any, second?: Function) {
+    let state = typeof first !== 'function' && first;
+    let hasState:Boolean = !!state;
+    let filter = hasState ? second : first;
+    return new Stream((write) => {
+      this.pipe((value: any) => {
+        let filtered = hasState ? filter(state, value) : filter(value);
+        if (filtered) {
+          write(filtered);
+        }
+      });
     });
-    return filteredStream;
   }
 }
+
+type WriteFunction = (write: Function) => void;
+type StreamOrWriteFunction = Stream | WriteFunction;
+
+function toStream(sof:StreamOrWriteFunction):Stream {
+  if (typeof sof === 'function') {
+    return new Stream(<WriteFunction>sof);
+  } else if (sof instanceof Stream) {
+    return sof;
+  }
+}
+
+export function stream(...args: StreamOrWriteFunction[]) {
+  args[0] = args[0] || new Stream();
+  return args.length > 1 ? Stream.join.apply(null, args.map(toStream)) : args[0];
+};
+
 
 export default Stream;
