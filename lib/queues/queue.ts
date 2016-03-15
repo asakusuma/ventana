@@ -31,13 +31,11 @@ class Queue implements QueueInterface {
    * @returns {Object} - Object with percent hidden properties
    */
   tap(value: any) {
-    this.items.forEach((element: QueueElementInterface) => {
+    this.items.map((element: QueueElementInterface) => {
       if (!this.intercept(value, element)) {
-        let result = this.collect(value, element);
-        if (result) {
-          this.stream.write(result);
-        }
+        return this.collect(this.stream.write.bind(this.stream), value, element);
       }
+      return element;
     });
   }
 
