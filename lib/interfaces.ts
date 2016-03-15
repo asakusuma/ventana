@@ -14,12 +14,13 @@ export interface QueueInterface {
   tap: (value: any) => void;
   intercept: (value: any, element:QueueElementInterface) => void;
   stream: StreamInterface;
+  toStream: () => StreamInterface
 }
 
 export interface StreamInterface {
   name: string;
   targets: Array<StreamInterface | QueueInterface | Function>;
   write: (value: any) => void;
-  pipe: (target: StreamInterface | QueueInterface | Function) => (StreamInterface | QueueInterface | Function);
+  pipe: (target: StreamInterface | QueueInterface | Function) => StreamInterface;
   filter: (first: any, second?: Function) => StreamInterface;
 }

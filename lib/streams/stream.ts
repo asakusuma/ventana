@@ -3,6 +3,7 @@ import { StreamInterface, QueueInterface } from './../interfaces';
 class Stream implements StreamInterface {
   name: string;
   targets: Array<Stream | QueueInterface | Function>;
+  targetEndpoints: Array<Stream>;
   constructor (source?:string|((write: Function) => void)) {
     this.name = name;
     if (typeof source === 'function') {
@@ -13,21 +14,32 @@ class Stream implements StreamInterface {
       this.name = source;
     }
     this.targets = [];
+    this.targetEndpoints = [];
   }
   write(value: any) {
-    this.targets.forEach((target: any) => {
+    this.targets.forEach((target: any, index: number) => {
       if (target instanceof Stream) {
         target.write(value);
       } else if (typeof target === 'function') {
-        (<Function>target)(value);
+        this.targetEndpoints[index].write((<Function>target)(value));
       } else if (typeof target.tap === 'function') {
         target.tap(value);
       }
     });
   }
-  pipe(target: Stream | QueueInterface | Function) {
+  pipe(target: Stream | QueueInterface | Function):StreamInterface {
     this.targets.push(target);
-    return target;
+    if (target instanceof Stream) {
+      this.targetEndpoints.push(null);
+      return target;
+    } else if (target instanceof Function) {
+      let endpoint = new Stream();
+      this.targetEndpoints.push(endpoint);
+      return endpoint;
+    } else {
+      this.targetEndpoints.push(null);
+      return target.toStream();
+    }
   }
 
   /**
