@@ -14,7 +14,7 @@ class ViewportElement extends QueueElement {
 }
 
 // Queue of viewport tracked dom element
-let viewportQueue = new RAFQueue('Viewport', (frame: Frame, el: ViewportElement) => {
+let viewportQueue = new RAFQueue('Viewport', (write: Function, frame: Frame, el: ViewportElement) => {
   let inViewport = el.bcr.top < frame.height &&
     el.bcr.top + el.bcr.height > 0 &&
     el.bcr.left < frame.width &&
@@ -24,6 +24,10 @@ let viewportQueue = new RAFQueue('Viewport', (frame: Frame, el: ViewportElement)
     el.callback();
   }
   el.inViewport = inViewport;
+
+  write(el);
+
+  return el;
 });
 
 raf.pipe(viewportQueue);
