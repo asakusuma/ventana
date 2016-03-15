@@ -6,6 +6,7 @@ function generateItem(index) {
   var title = document.createElement('h3');
   content.innerText = text;
   title.innerText = 'Item ' + index;
+  item.setAttribute('data-item-id', index);
   item.classList.add('item');
   item.appendChild(title);
   item.appendChild(content);
