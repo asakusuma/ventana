@@ -6,10 +6,10 @@ import { Frame, RAFPhase } from './../streams/frame';
 class ViewportElement extends QueueElement {
   inViewport: Boolean;
   constructor(id: string, el: Element, callback: Function) {
+    super();
     this.id = id;
     this.el = el;
     this.callback = callback;
-    super();
   }
 }
 

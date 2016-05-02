@@ -30,8 +30,8 @@
     "rsvp": "^3.1.0",
     "serve-static": "^1.10.0",
     "sinon": "^1.17.2",
-    "testem": "^0.9.8",
-    "typescript": "^1.7.3",
+    "testem": "^1.6.0",
+    "typescript": "^1.8.10",
     "webpack": "^1.12.9"
   },
   "engines": {
