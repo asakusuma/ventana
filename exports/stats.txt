@@ -1,1 +1,0 @@
-ventana.js is 1.89 kB gzipped.
