@@ -8,15 +8,37 @@
         padding:30px;
       }
 
+      #content, body, html {
+        margin: 0px;
+        padding: 0px;
+      }
+
       #content {
         width: 600px;
         margin: auto;
       }
 
+      .item:nth-child(even) {
+        background-color:#EEE;
+      }
+
+      .item:nth-child(odd) {
+        background-color:#CCC;
+      }
+
       .item {
-        border: 1px solid black;
-        margin: 10px;
-        padding: 10px;
+        margin: 0px;
+        padding:0px;
+        height: 200px;
+        display:block;
+        position: relative;
+      }
+
+      .item h3 {
+        position: relative;
+        display: block;
+        margin: 0px;
+        padding: 0px;
       }
 
       #scroll {
@@ -27,16 +49,13 @@
     <!-- <script type="text/javascript" src="../../exports/ventana.js"></script> -->
   </head>
   <body>
-    <h2>Ventana Test App</h2>
-
     <div id="content">
-      <div id="top-items"></div>
+      <div class="parent" id="top-items"></div>
       <div id="scroll"></div>
       <div id="bottom-items"></div>
     </div>
 
     <script type="text/javascript" src="setup.js"></script>
-    <script type="text/javascript" src="require.js"></script>
-    <script type="text/javascript" src="app.js"></script>
+    <script type="text/javascript" src="ventana.js"></script>
   </body>
 </html>
