@@ -5,6 +5,7 @@ import { Frame, RAFPhase } from './frame';
 class RAFStream extends Stream {
   write (timestamp: number) {
     let frame = new Frame();
+    frame.timestamp = timestamp;
     frame.phase = RAFPhase.MEASURE;
     frame.scrollTop = W.getScrollTop();
     frame.scrollLeft = W.getScrollLeft();

@@ -1,7 +1,8 @@
+import w from './window-proxy';
 import scroll from './streams/scroll';
 import resize from './streams/resize';
 import Element from './queues/element';
-import { poll } from './streams/raf';
+import { poll as pollStream, measure as measureStream } from './streams/raf';
 import { Frame } from './streams/frame';
 export { default as onViewport } from './implementations/viewport';
 export { default as RAFQueue } from './queues/raf-queue';
@@ -27,24 +28,44 @@ let listeners:ListenersMap = {
   show: []
 };
 
-scroll.pipe(() => {
+function generateTrigger(key: string) {
+  return () => {
+    let callbacks = listeners[key], len = callbacks.length, i = 0;
+    for (i = 0; i < len; i++) {
+      callbacks[i].call(null);
+    }
+  }
+}
+
+scroll.pipe((arg: any) => {
   listeners.move.forEach((callback) => {
-    callback.call(null);
+    callback.call(null, arg);
   });
 });
 
-resize.pipe(() => {
+resize.pipe((arg: any) => {
   listeners.resize.forEach((callback) => {
-    callback.call(null);
+    callback.call(null, arg);
   });
 });
+
+if (w.hasDOM) {
+  window.addEventListener('unload', generateTrigger('destroy'));
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      generateTrigger('show')();
+    } else {
+      generateTrigger('hide')();
+    }
+  });
+}
 
 let cY = 0;
 let cX = 0;
 let cW = 0;
 let cH = 0;
 
-poll.pipe((frame: Frame) => {
+pollStream.pipe((frame: Frame) => {
   cY = frame.scrollTop;
   cX = frame.scrollLeft;
   cW = frame.width;
@@ -53,6 +74,14 @@ poll.pipe((frame: Frame) => {
 
 export function on(eventName: string, callback: Function) {
   listeners[eventName].push(callback);
+}
+
+export function queue(callback: Function) {
+  pollStream.pipe(callback);
+}
+
+export function measure(callback: Function) {
+  measureStream.pipe(callback);
 }
 
 interface AbsoluteRect {
