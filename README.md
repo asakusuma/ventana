@@ -43,12 +43,12 @@ The native DOM API exposes a nifty function called [Element.getBoundingClientRec
 
 Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport. You can pass an offset object that expects any combination of the following properties: top, left, bottom, right.
 
-## How it works
+## Primitive Abstractions
 
 Under the hood, there are two main abstractions used to implement Ventana: streams and queues.
 
 #### Streams
-Ventana streams are barebones, essentially just lists of listeners with the ability to filter on values and work nicely with queues. Listeners can be functions, other streams, or queues. You write a single value to the stream, and each listener gets called with that value. Streams are used to represent a single type of repeatable event, like the user scrolling or the window being re-sized. In the later case, the value being passed by the stream could be the updated dimensions of the window.
+The Ventana stream is a simple abstraction around lists of listeners with the ability to filter on values and work nicely with queues. Listeners can be functions, other streams, or queues. You write a single value to the stream, and each listener gets called with that value. Streams are used to represent a single type of repeatable event, like the user scrolling or the window being re-sized. In the later case, the value being passed by the stream could be the updated dimensions of the window.
 
 #### Queues
 Ventana queues represent a set of objects that can receive a stream of values, i.e. a Stream. Queues are usually an abstraction above a paired stream. For instance, a queue can represent a list of DOM objects that need to be modified when the user scrolls. In this example, a stream representing scroll events could be piped into the queue representing the DOM objects.
