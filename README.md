@@ -8,7 +8,7 @@ ventana.on('scroll', function() {
 ```
 
 ## Usage
-Ventana is available as a [standard npm module](https://www.npmjs.com/package/ventana). Additionally, you can use the [minified UMD file](https://github.com/asakusuma/ventana/blob/master/exports/ventana.umd.js).
+Ventana is available as a [standard npm module](https://www.npmjs.com/package/ventana). Additionally, you can use the [minified UMD file](https://github.com/asakusuma/ventana/blob/master/exports/min/ventana.js).
 
 ## API
 
@@ -20,6 +20,8 @@ Bind to window events:
 * **destroy** (close tab or entire window)
 * **hide** (move to another tab)
 * **show**
+
+`move` and `resize` callbacks receive an object parameter with `timestamp`, `scrollTop`, `scrollLeft`, `width`, and `height`.
 
 #### Performance note
 For performance reasons, the move event (aka scroll) is [implemented](https://github.com/asakusuma/ventana/blob/master/lib/ventana.js#L32) via [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame).
