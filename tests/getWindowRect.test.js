@@ -1,6 +1,6 @@
 QUnit.module('getWindowRect');
 
-QUnit.skip('Returns correct object if no offset is set', function(assert){
+QUnit.test('Returns correct object if no offset is set', function(assert){
   var result = ventana.getWindowRect();
   assert.equal(result.top, 0, 'top should equal scrolled Y position');
   assert.equal(result.left, 0, 'left should equal scrolled x position');
@@ -8,7 +8,7 @@ QUnit.skip('Returns correct object if no offset is set', function(assert){
   assert.equal(result.height, window.innerHeight, 'height should equal innerHeight');
 });
 
-QUnit.skip('Returns correct object when offset is set', function(assert){
+QUnit.test('Returns correct object when offset is set', function(assert){
   var result = ventana.getWindowRect({
     top: 5
   });
