@@ -64,11 +64,17 @@ let cX = 0;
 let cW = 0;
 let cH = 0;
 
+let taskQueue: Function[] = [];
+
 pollStream.pipe((frame: Frame) => {
   cY = frame.scrollTop;
   cX = frame.scrollLeft;
   cW = frame.width;
   cH = frame.height;
+
+  while (taskQueue.length > 0) {
+    taskQueue.pop().call(null, frame);
+  }
 });
 
 export function on(eventName: string, callback: Function) {
@@ -76,11 +82,7 @@ export function on(eventName: string, callback: Function) {
 }
 
 export function queue(callback: Function) {
-  pollStream.pipe(callback);
-}
-
-export function measure(callback: Function) {
-  measureStream.pipe(callback);
+  taskQueue.push(callback);
 }
 
 interface AbsoluteRect {

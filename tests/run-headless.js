@@ -7,7 +7,10 @@ server.stdout.on('data', (data) => {
   // Wait for signal that test app has booted
   if (data.indexOf('Serving Ventana Test App') > -1 && !test) {
     var env = Object.create( process.env );
-    env.DEBUG = 'nightmare';
+
+    // Uncomment to debug headless tests
+    // env.DEBUG = 'nightmare';
+
     test = spawn('./node_modules/mocha/bin/mocha', ['tests/headless/'], { env: env });
 
     test.stderr.on('data', (data) => {
