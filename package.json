@@ -44,6 +44,6 @@
     "build": "rm -rf exports && broccoli build exports && npm run stats",
     "tsc": "rm -rf exports/amd && tsc",
     "stats": "node size-calc",
-    "test": "npm run tsc; testem ci; node tests/run-headless"
+    "test": "npm run tsc && testem ci && node tests/run-headless"
   }
 }
