@@ -1,4 +1,6 @@
 node_modules
 npm-debug.log
 tmp
-exports/**/*.js
+exports/amd
+old-lib
+tests/consumers/local

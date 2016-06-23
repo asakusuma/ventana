@@ -1,8 +1,9 @@
 {
   "framework":"qunit",
   "src_files": [
+    "tests/polyfills.js",
     "node_modules/sinon/pkg/sinon.js",
-    "exports/ventana.umd.js",
+    "exports/ventana.js",
     "tests/**/*.test.js"
   ],
   "launch_in_ci": [

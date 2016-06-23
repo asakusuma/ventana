@@ -1,24 +1,28 @@
-var esTranspiler = require('broccoli-babel-transpiler');
-var uglify = require('broccoli-uglify-js');
-var merge = require('broccoli-merge-trees');
 var Funnel = require('broccoli-funnel');
+var bundle = require('./bundler');
+var esTranspiler = require('broccoli-babel-transpiler');
+var merge = require('broccoli-merge-trees');
+var uglify = require('broccoli-uglify-js');
+var tsTranspiler = require('broccoli-typescript-compiler');
 
-var lib = 'lib';
-
-var cjs = esTranspiler(lib, {
-  modules: 'common',
-  moduleId: 'ventana'
+var inputTree = 'lib';
+var typescript = tsTranspiler(inputTree);
+var scriptTree = esTranspiler(typescript, {
+  modules: 'amd',
+  moduleIds: true
 });
 
-var umd = uglify(esTranspiler(lib, {
-  modules: 'umd',
-  moduleId: 'ventana'
-}));
-
-var webProduction = new Funnel(umd, {
-  getDestinationPath: function(relativePath) {
-    return 'ventana.umd.js'
-  }
+var amd = new Funnel(typescript, {
+  destDir: 'amd'
 });
 
-module.exports = merge([cjs, webProduction]);
+var bundled = bundle([typescript]);
+
+var prod = new Funnel(uglify(bundled, {
+  mangle: true,
+  compress: true
+}), {
+  destDir: 'min'
+});
+
+module.exports = merge([bundled, prod, amd]);
