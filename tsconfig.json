@@ -15,7 +15,6 @@
     "./lib/**/*.ts"
   ],
   "files": [
-    "./lib/implementations/viewport.ts",
     "./lib/index.ts",
     "./lib/interfaces.ts",
     "./lib/queues/element.ts",
