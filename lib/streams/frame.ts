@@ -1,7 +1,4 @@
-enum RAFPhase {
-  MEASURE,
-  MUTATE
-}
+import { RAFPhase } from './../interfaces';
 
 class Frame {
   phase: RAFPhase;
@@ -16,7 +13,4 @@ class Frame {
   }
 }
 
-export {
-  Frame,
-  RAFPhase
-};
+export default Frame;

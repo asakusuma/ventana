@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "amd",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "sourceMap": false,
     "isolatedModules": false,
-    "outDir": "exports/amd"
+    "declaration": true,
+    "module": "commonjs",
+    "target": "es5",
+    "outDir": "exports/cjs",
+    "sourceMap": true,
+    "moduleResolution": "node"
   },
   "filesGlob": [
     "./lib/**/*.ts"
@@ -21,9 +21,7 @@
     "./lib/queues/queue.ts",
     "./lib/queues/raf-queue.ts",
     "./lib/streams/frame.ts",
-    "./lib/streams/raf.ts",
-    "./lib/streams/resize.ts",
-    "./lib/streams/scroll.ts",
+    "./lib/streams/streams.ts",
     "./lib/streams/stream.ts",
     "./lib/window-proxy.ts"
   ],

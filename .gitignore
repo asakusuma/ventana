@@ -1,6 +1,6 @@
 node_modules
 npm-debug.log
 tmp
-exports/amd
+exports/cjs
 old-lib
 tests/consumers/local

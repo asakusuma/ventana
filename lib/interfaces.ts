@@ -1,3 +1,8 @@
+export enum RAFPhase {
+  MEASURE,
+  MUTATE
+}
+
 export interface QueueElementInterface {
   el: Element;
   callback: Function;

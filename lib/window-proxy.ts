@@ -12,7 +12,7 @@ interface WindowProxy {
 
 let hasDOM = !!((typeof window !== 'undefined') && window && (typeof document !== 'undefined') && document);
 
-var W: WindowProxy = {
+let W: WindowProxy = {
   hasDOM,
   getScrollTop: nop,
   getScrollLeft: nop,
@@ -36,5 +36,9 @@ if (hasDOM) {
     (<any>document).addEventListener('DOMContentLoaded', hasDomSetup);
   }
 }
+
+export {
+  WindowProxy
+};
 
 export default W;

@@ -1,11 +1,14 @@
 import w from './window-proxy';
-import scroll from './streams/scroll';
-import resize from './streams/resize';
+import {
+  resize,
+  scroll,
+  raf as RAFStream,
+  poll as pollStream,
+  measure as measureStream
+} from './streams/streams';
 export {default as QueueElement } from './queues/element';
-import { poll as pollStream, measure as measureStream } from './streams/raf';
-import { Frame } from './streams/frame';
+import Frame from './streams/frame';
 export { default as RAFQueue } from './queues/raf-queue';
-export { raf as RAFStream } from './streams/raf';
 
 export { default as Stream } from './streams/stream';
 export { stream } from './streams/stream';
@@ -108,6 +111,10 @@ interface Offset {
   right: number;
   bottom: number;
 }
+
+export {
+  Offset
+};
 
 export function getWindowRect(offset: Offset) {
   offset = offset || {

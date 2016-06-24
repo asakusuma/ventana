@@ -3,8 +3,8 @@
   "description": "Viewport and window event utility microlibrary",
   "version": "0.4.0",
   "author": "Asa Kusuma",
-  "main": "exports/ventana.js",
-  "jsnext:main": "lib/ventana.js",
+  "main": "exports/cjs/index.js",
+  "typings": "exports/cjs/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/asakusuma/ventana"
@@ -17,32 +17,28 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "broccoli": "^0.16.2",
-    "broccoli-babel-transpiler": "^5.4.5",
-    "broccoli-caching-writer": "^2.2.0",
     "broccoli-funnel": "^1.0.1",
-    "broccoli-merge-trees": "^0.2.3",
-    "broccoli-typescript-compiler": "^0.1.1",
     "broccoli-uglify-js": "0.1.3",
-    "gzip-size": "^3.0.0",
-    "pretty-bytes": "^2.0.1",
+    "browserify": "^13.0.1",
     "chai": "^3.5.0",
     "express": "^4.13.4",
+    "gzip-size": "^3.0.0",
     "mocha": "^2.5.3",
     "nightmare": "^2.5.1",
+    "pretty-bytes": "^2.0.1",
     "rsvp": "^3.1.0",
     "serve-static": "^1.10.3",
     "sinon": "^1.17.2",
     "testem": "^1.8.0",
-    "typescript": "^1.8.10",
-    "webpack": "^1.12.9"
+    "typescript": "^1.8.10"
   },
   "engines": {
     "node": ">= 0.10.0"
   },
   "scripts": {
     "watch": "broccoli-timepiece exports/",
-    "build": "rm -rf exports && broccoli build exports && npm run stats",
-    "tsc": "rm -rf exports/amd && tsc",
+    "build": "./build.sh",
+    "tsc": "rm -rf exports/cjs && tsc",
     "stats": "node size-calc",
     "test": "npm run tsc && testem ci && node tests/run-headless"
   }

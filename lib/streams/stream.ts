@@ -90,8 +90,12 @@ class Stream implements StreamInterface {
   }
 }
 
-type WriteFunction = (write: Function) => void;
-type StreamOrWriteFunction = Stream | WriteFunction;
+export {
+  Stream
+};
+
+export type WriteFunction = (write: Function) => void;
+export type StreamOrWriteFunction = Stream | WriteFunction;
 
 function toStream(sof:StreamOrWriteFunction):Stream {
   if (typeof sof === 'function') {
@@ -105,6 +109,5 @@ export function stream(...args: StreamOrWriteFunction[]) {
   args[0] = args[0] || new Stream();
   return args.length > 1 ? Stream.join.apply(null, args.map(toStream)) : args[0];
 };
-
 
 export default Stream;
