@@ -2,8 +2,11 @@
 "use strict";
 var window_proxy_1 = require('./window-proxy');
 var streams_1 = require('./streams/streams');
+exports.RAFStream = streams_1.raf;
 var element_1 = require('./queues/element');
 exports.QueueElement = element_1.default;
+var frame_1 = require('./streams/frame');
+exports.Frame = frame_1.default;
 var raf_queue_1 = require('./queues/raf-queue');
 exports.RAFQueue = raf_queue_1.default;
 var stream_1 = require('./streams/stream');
@@ -94,7 +97,7 @@ function getWindowRect(offset) {
 }
 exports.getWindowRect = getWindowRect;
 
-},{"./queues/element":3,"./queues/raf-queue":5,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
+},{"./queues/element":3,"./queues/raf-queue":5,"./streams/frame":6,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
 "use strict";
 (function (RAFPhase) {
     RAFPhase[RAFPhase["MEASURE"] = 0] = "MEASURE";

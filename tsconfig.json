@@ -21,8 +21,8 @@
     "./lib/queues/queue.ts",
     "./lib/queues/raf-queue.ts",
     "./lib/streams/frame.ts",
-    "./lib/streams/streams.ts",
     "./lib/streams/stream.ts",
+    "./lib/streams/streams.ts",
     "./lib/window-proxy.ts"
   ],
   "atom": {

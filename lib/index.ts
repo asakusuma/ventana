@@ -6,12 +6,13 @@ import {
   poll as pollStream,
   measure as measureStream
 } from './streams/streams';
-export {default as QueueElement } from './queues/element';
+export { default as QueueElement } from './queues/element';
 import Frame from './streams/frame';
 export { default as RAFQueue } from './queues/raf-queue';
 
 export { default as Stream } from './streams/stream';
 export { stream } from './streams/stream';
+export { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
 
 interface ListenersMap {
   move: Function[],
@@ -113,7 +114,9 @@ interface Offset {
 }
 
 export {
-  Offset
+  Offset,
+  Frame,
+  RAFStream
 };
 
 export function getWindowRect(offset: Offset) {
