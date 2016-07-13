@@ -9,6 +9,7 @@ import {
 export { default as QueueElement } from './queues/element';
 import Frame from './streams/frame';
 export { default as RAFQueue } from './queues/raf-queue';
+export { default as Queue } from './queues/queue';
 
 export { default as Stream } from './streams/stream';
 export { stream } from './streams/stream';
