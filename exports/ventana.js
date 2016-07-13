@@ -9,6 +9,8 @@ var frame_1 = require('./streams/frame');
 exports.Frame = frame_1.default;
 var raf_queue_1 = require('./queues/raf-queue');
 exports.RAFQueue = raf_queue_1.default;
+var queue_1 = require('./queues/queue');
+exports.Queue = queue_1.default;
 var stream_1 = require('./streams/stream');
 exports.Stream = stream_1.default;
 var stream_2 = require('./streams/stream');
@@ -97,7 +99,7 @@ function getWindowRect(offset) {
 }
 exports.getWindowRect = getWindowRect;
 
-},{"./queues/element":3,"./queues/raf-queue":5,"./streams/frame":6,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
+},{"./queues/element":3,"./queues/queue":4,"./queues/raf-queue":5,"./streams/frame":6,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
 "use strict";
 (function (RAFPhase) {
     RAFPhase[RAFPhase["MEASURE"] = 0] = "MEASURE";
@@ -125,6 +127,26 @@ var Queue = (function () {
         this.collect = collect;
         this.stream = new stream_1.default(name + ' output stream');
     }
+    Queue.prototype.remove = function (identifier) {
+        var predicate;
+        if (typeof identifier === 'string') {
+            predicate = function (element) { return element.id === identifier; };
+        }
+        else {
+            predicate = function (element) { return element.el === identifier; };
+        }
+        var len = this.items.length;
+        for (var i = 0; i < len; i++) {
+            if (predicate(this.items[i])) {
+                this.items.splice(i, 1);
+                i--;
+                len--;
+            }
+        }
+    };
+    Queue.prototype.clear = function () {
+        this.items = [];
+    };
     Queue.prototype.push = function (element) {
         this.items.push(element);
     };

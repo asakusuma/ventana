@@ -16,6 +16,28 @@ class Queue implements QueueInterface {
     this.collect = collect;
     this.stream = new Stream(name + ' output stream');
   }
+
+  remove(identifier: Element|string) {
+    let predicate:Function;
+    if (typeof identifier === 'string') {
+      predicate = (element: QueueElementInterface) => element.id === identifier;
+    } else {
+      predicate = (element: QueueElementInterface) => element.el === identifier;
+    }
+    let len = this.items.length;
+    for (let i = 0; i < len; i++) {
+      if (predicate(this.items[i])) {
+        this.items.splice(i, 1);
+        i--;
+        len--;
+      }
+    }
+  }
+
+  clear() {
+    this.items = [];
+  }
+
   push(element: QueueElementInterface) {
     this.items.push(element);
   }
