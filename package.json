@@ -1,7 +1,7 @@
 {
   "name": "ventana",
   "description": "Viewport and window event utility microlibrary",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Asa Kusuma",
   "main": "exports/cjs/index.js",
   "typings": "exports/cjs/index.d.ts",
