@@ -18,7 +18,7 @@ let W: WindowProxy = {
   getScrollLeft: nop,
   getHeight: nop,
   getWidth: nop,
-  rAF: hasDOM && (<any>window).requestAnimationFrame.bind(window)
+  rAF: hasDOM && !!window.requestAnimationFrame ? window.requestAnimationFrame.bind(window) : () => {}
 };
 
 function hasDomSetup() {

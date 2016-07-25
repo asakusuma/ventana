@@ -407,7 +407,7 @@ var W = {
     getScrollLeft: nop,
     getHeight: nop,
     getWidth: nop,
-    rAF: hasDOM && window.requestAnimationFrame.bind(window)
+    rAF: hasDOM && !!window.requestAnimationFrame ? window.requestAnimationFrame.bind(window) : function () { }
 };
 function hasDomSetup() {
     var se = typeof document.scrollingElement !== 'undefined';
