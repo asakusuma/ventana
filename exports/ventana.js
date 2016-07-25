@@ -214,7 +214,7 @@ exports.default = Frame;
 var Stream = (function () {
     function Stream(source) {
         var _this = this;
-        this.name = name;
+        this.name = 'anonymous';
         if (typeof source === 'function') {
             source.call(this, function () {
                 var args = [];
