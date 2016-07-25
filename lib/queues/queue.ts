@@ -18,7 +18,7 @@ class Queue implements QueueInterface {
   }
 
   remove(identifier: Element|string) {
-    let predicate:Function;
+    let predicate: Function;
     if (typeof identifier === 'string') {
       predicate = (element: QueueElementInterface) => element.id === identifier;
     } else {
@@ -71,7 +71,7 @@ class Queue implements QueueInterface {
    * @returns {Boolean} - Should be true if value/element pair shouldn't
    * be tapped
    */
-  intercept(value: any, element:QueueElementInterface) {
+  intercept(value: any, element: QueueElementInterface) {
     return false;
   }
 }
