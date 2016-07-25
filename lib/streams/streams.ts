@@ -14,7 +14,7 @@ class RAFStream extends Stream {
     frame.height = W.getHeight();
 
     super.write(frame);
-    frame.phase = RAFPhase.MUTATE
+    frame.phase = RAFPhase.MUTATE;
     super.write(frame);
   }
 }
@@ -36,7 +36,7 @@ let poll = raf.filter((frame: Frame) => {
 let pollForAF = () => {
   raf.write(Date.now());
   W.rAF(pollForAF);
-}
+};
 W.rAF(pollForAF);
 
 let w = -1;

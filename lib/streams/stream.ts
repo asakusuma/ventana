@@ -4,10 +4,10 @@ class Stream implements StreamInterface {
   name: string;
   targets: Array<Stream | QueueInterface | Function>;
   targetEndpoints: Array<Stream>;
-  constructor (source?:string|((write: Function) => void)) {
+  constructor (source?: string|((write: Function) => void)) {
     this.name = name;
     if (typeof source === 'function') {
-      source.call(this, (...args:any[]) => {
+      source.call(this, (...args: any[]) => {
         this.write.apply(this, args);
       });
     } else if (typeof source === 'string') {
@@ -27,7 +27,7 @@ class Stream implements StreamInterface {
       }
     });
   }
-  pipe(target: Stream | QueueInterface | Function):StreamInterface {
+  pipe(target: Stream | QueueInterface | Function): StreamInterface {
     this.targets.push(target);
     if (target instanceof Stream) {
       this.targetEndpoints.push(null);
@@ -54,7 +54,7 @@ class Stream implements StreamInterface {
    * @returns {Stream} - The generated stream
    */
   static join(...args: Stream[]) {
-    let cache:any[] = new Array(args.length);
+    let cache: any[] = new Array(args.length);
     return new Stream(function (write: Function) {
       args.forEach((stream, i) => {
         stream.pipe((value: any) => {
@@ -77,7 +77,7 @@ class Stream implements StreamInterface {
    */
   filter(first: any, second?: Function) {
     let state = typeof first !== 'function' && first;
-    let hasState:Boolean = !!state;
+    let hasState: Boolean = !!state;
     let filter = hasState ? second : first;
     return new Stream((write) => {
       this.pipe((value: any) => {
@@ -97,7 +97,7 @@ export {
 export type WriteFunction = (write: Function) => void;
 export type StreamOrWriteFunction = Stream | WriteFunction;
 
-function toStream(sof:StreamOrWriteFunction):Stream {
+function toStream(sof: StreamOrWriteFunction): Stream {
   if (typeof sof === 'function') {
     return new Stream(<WriteFunction>sof);
   } else if (sof instanceof Stream) {
