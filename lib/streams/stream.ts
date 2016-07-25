@@ -5,7 +5,7 @@ class Stream implements StreamInterface {
   targets: Array<Stream | QueueInterface | Function>;
   targetEndpoints: Array<Stream>;
   constructor (source?: string|((write: Function) => void)) {
-    this.name = name;
+    this.name = 'anonymous';
     if (typeof source === 'function') {
       source.call(this, (...args: any[]) => {
         this.write.apply(this, args);
