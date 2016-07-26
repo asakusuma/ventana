@@ -39,6 +39,7 @@
   "scripts": {
     "watch": "broccoli-timepiece exports/",
     "build": "./build.sh",
+    "serve": "node tests/app/server",
     "tsc": "rm -rf exports/cjs && tsc",
     "stats": "node size-calc",
     "test": "npm run tsc && testem ci && node tests/run-headless",
