@@ -31,18 +31,6 @@ For performance reasons, the move event (aka scroll) is [implemented](https://gi
 ##### `ventana.queue(Function callback)`
 Queue up a function to be called after the next [requestAnimationFrame](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) loop completes.
 
-<hr>
-
-##### `ventana.mapBoundingRectToAbsolute(Object boundingRect)` -> `Object`
-
-The native DOM API exposes a nifty function called [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect), which returns positioning info about a DOM element. However, this info is relative to the viewport. Use **.mapBoundingRectToAbsolute** to map this object with relative position values to an object with absolute position values.
-
-<hr>
-
-##### `ventana.getWindowRect(Object offset)` -> `Object`
-
-Returns the [Element.getBoundingClientRect()](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) equivalent value for the viewport. You can pass an offset object that expects any combination of the following properties: top, left, bottom, right.
-
 ## Primitive Abstractions
 
 Under the hood, there are two main abstractions used to implement Ventana: streams and queues.

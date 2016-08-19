@@ -2,6 +2,11 @@
 
 ### 0.5.0 (July 13, 2016)
 
+  - Removed `getWindowRect()`
+  - Removed `mapBoundingRectToAbsolute()`
+
+### 0.5.0 (July 13, 2016)
+
   - Added `Queue.remove()` for removing an element in a queue
   - Added `Queue.clear()` for removing all elements in a queue
 
