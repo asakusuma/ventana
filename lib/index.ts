@@ -64,19 +64,9 @@ if (w.hasDOM) {
   });
 }
 
-let cY = 0;
-let cX = 0;
-let cW = 0;
-let cH = 0;
-
 let taskQueue: Function[] = [];
 
 pollStream.pipe((frame: Frame) => {
-  cY = frame.scrollTop;
-  cX = frame.scrollLeft;
-  cW = frame.width;
-  cH = frame.height;
-
   while (taskQueue.length > 0) {
     taskQueue.pop().call(null, frame);
   }
@@ -97,16 +87,6 @@ interface AbsoluteRect {
   height: number;
 }
 
-export function mapBoundingRectToAbsolute(boundingRect: ClientRect) {
-  let dimensions = {
-    top: boundingRect.top + cY,
-    left: boundingRect.left + cX,
-    width: boundingRect.width,
-    height: boundingRect.height
-  };
-  return dimensions;
-}
-
 interface Offset {
   top: number;
   left: number;
@@ -119,18 +99,3 @@ export {
   Frame,
   RAFStream
 };
-
-export function getWindowRect(offset: Offset) {
-  offset = offset || {
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0
-  };
-  return {
-    top: cY + offset.top,
-    left: cX + offset.left,
-    height: cH - offset.top - offset.bottom,
-    width: cW - offset.left - offset.right
-  };
-}
