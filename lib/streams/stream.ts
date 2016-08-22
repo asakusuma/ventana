@@ -45,7 +45,7 @@ class Stream implements StreamInterface {
       this.targets.push({
         stream: target,
         endpoint: target
-      })
+      });
       return target;
     } else if (target instanceof Function) {
       let stream = new Stream();

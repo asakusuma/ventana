@@ -49,7 +49,7 @@ class Queue implements QueueInterface {
 
   push(element: QueueElementInterface) {
     this.items.push(element);
-    while(this.populateCallbacks.length > 0) {
+    while (this.populateCallbacks.length > 0) {
       this.populateCallbacks.pop().call(this);
     }
   }

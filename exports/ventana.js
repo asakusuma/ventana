@@ -51,16 +51,8 @@ if (window_proxy_1.default.hasDOM) {
         }
     });
 }
-var cY = 0;
-var cX = 0;
-var cW = 0;
-var cH = 0;
 var taskQueue = [];
 streams_1.poll.pipe(function (frame) {
-    cY = frame.scrollTop;
-    cX = frame.scrollLeft;
-    cW = frame.width;
-    cH = frame.height;
     while (taskQueue.length > 0) {
         taskQueue.pop().call(null, frame);
     }
@@ -73,31 +65,6 @@ function queue(callback) {
     taskQueue.push(callback);
 }
 exports.queue = queue;
-function mapBoundingRectToAbsolute(boundingRect) {
-    var dimensions = {
-        top: boundingRect.top + cY,
-        left: boundingRect.left + cX,
-        width: boundingRect.width,
-        height: boundingRect.height
-    };
-    return dimensions;
-}
-exports.mapBoundingRectToAbsolute = mapBoundingRectToAbsolute;
-function getWindowRect(offset) {
-    offset = offset || {
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-    };
-    return {
-        top: cY + offset.top,
-        left: cX + offset.left,
-        height: cH - offset.top - offset.bottom,
-        width: cW - offset.left - offset.right
-    };
-}
-exports.getWindowRect = getWindowRect;
 
 },{"./queues/element":3,"./queues/queue":4,"./queues/raf-queue":5,"./streams/frame":6,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
 "use strict";
@@ -144,11 +111,22 @@ var Queue = (function () {
             }
         }
     };
+    Queue.prototype.callOnPopulate = function (callback) {
+        if (this.items.length > 0) {
+            callback.call(this);
+        }
+        else {
+            this.populateCallbacks.push(callback);
+        }
+    };
     Queue.prototype.clear = function () {
         this.items = [];
     };
     Queue.prototype.push = function (element) {
         this.items.push(element);
+        while (this.populateCallbacks.length > 0) {
+            this.populateCallbacks.pop().call(this);
+        }
     };
     Queue.prototype.toStream = function () {
         return this.stream;
@@ -214,50 +192,75 @@ exports.default = Frame;
 var Stream = (function () {
     function Stream(source) {
         var _this = this;
+        this.instanceInit = function () { };
+        this.initCalled = false;
         this.name = 'anonymous';
         if (typeof source === 'function') {
-            source.call(this, function () {
+            this.instanceInit = function () {
                 var args = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
                 _this.write.apply(_this, args);
-            });
+            };
         }
         else if (typeof source === 'string') {
             this.name = source;
         }
         this.targets = [];
-        this.targetEndpoints = [];
     }
+    Stream.prototype.init = function () {
+        if (!this.initCalled) {
+            this.initCalled = true;
+            this.onInit.call(this);
+        }
+    };
+    Stream.prototype.onInit = function () {
+        this.instanceInit();
+    };
     Stream.prototype.write = function (value) {
-        var _this = this;
         this.targets.forEach(function (target, index) {
-            if (target instanceof Stream) {
-                target.write(value);
+            if (target.endpoint instanceof Stream) {
+                target.stream.write(value);
             }
-            else if (typeof target === 'function') {
-                _this.targetEndpoints[index].write(target(value));
+            else if (typeof target.endpoint === 'function') {
+                target.stream.write(target.endpoint(value));
             }
-            else if (typeof target.tap === 'function') {
-                target.tap(value);
+            else if (typeof target.endpoint.tap === 'function') {
+                target.endpoint.tap(value);
             }
         });
     };
     Stream.prototype.pipe = function (target) {
-        this.targets.push(target);
+        var _this = this;
         if (target instanceof Stream) {
-            this.targetEndpoints.push(null);
+            this.targets.push({
+                stream: target,
+                endpoint: target
+            });
             return target;
         }
         else if (target instanceof Function) {
-            var endpoint = new Stream();
-            this.targetEndpoints.push(endpoint);
-            return endpoint;
+            var stream_1 = new Stream();
+            this.targets.push({
+                endpoint: function (result) {
+                    stream_1.write(target(result));
+                },
+                stream: stream_1
+            });
+            this.init();
+            return stream_1;
         }
         else {
-            this.targetEndpoints.push(null);
-            return target.toStream();
+            var stream_2 = target.toStream();
+            this.targets.push({
+                stream: stream_2,
+                endpoint: target
+            });
+            target.callOnPopulate(function () {
+                _this.init();
+            });
+            return stream_2;
         }
     };
     Stream.join = function () {
@@ -330,6 +333,15 @@ var RAFStream = (function (_super) {
     function RAFStream() {
         _super.apply(this, arguments);
     }
+    RAFStream.prototype.onInit = function () {
+        var _this = this;
+        var pollForAF = function () {
+            _this.write(Date.now());
+            window_proxy_1.default.rAF(pollForAF);
+        };
+        window_proxy_1.default.rAF(pollForAF);
+        _super.prototype.onInit.call(this);
+    };
     RAFStream.prototype.write = function (timestamp) {
         var frame = new frame_1.default();
         frame.timestamp = timestamp;
@@ -359,11 +371,6 @@ var poll = raf.filter(function (frame) {
     }
 });
 exports.poll = poll;
-var pollForAF = function () {
-    raf.write(Date.now());
-    window_proxy_1.default.rAF(pollForAF);
-};
-window_proxy_1.default.rAF(pollForAF);
 var w = -1;
 var h = -1;
 var resize = measure.filter(function (frame) {
