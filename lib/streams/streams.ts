@@ -4,6 +4,14 @@ import Frame from './frame';
 import { RAFPhase } from './../interfaces';
 
 class RAFStream extends Stream {
+  onInit() {
+    let pollForAF = () => {
+      this.write(Date.now());
+      W.rAF(pollForAF);
+    };
+    W.rAF(pollForAF);
+    super.onInit();
+  }
   write (timestamp: number) {
     let frame = new Frame();
     frame.timestamp = timestamp;
@@ -32,12 +40,6 @@ let poll = raf.filter((frame: Frame) => {
     return frame;
   }
 });
-
-let pollForAF = () => {
-  raf.write(Date.now());
-  W.rAF(pollForAF);
-};
-W.rAF(pollForAF);
 
 let w = -1;
 let h = -1;

@@ -1,44 +1,72 @@
-import { StreamInterface, QueueInterface } from './../interfaces';
+import { StreamInterface, StreamTarget, QueueInterface } from './../interfaces';
+
+export {
+  Stream
+};
 
 class Stream implements StreamInterface {
   name: string;
-  targets: Array<Stream | QueueInterface | Function>;
-  targetEndpoints: Array<Stream>;
+  targets: Array<StreamTarget>;
+  instanceInit = () => {};
+  private initCalled: Boolean = false;
   constructor (source?: string|((write: Function) => void)) {
     this.name = 'anonymous';
     if (typeof source === 'function') {
-      source.call(this, (...args: any[]) => {
+      this.instanceInit = (...args: any[]) => {
         this.write.apply(this, args);
-      });
+      };
     } else if (typeof source === 'string') {
       this.name = source;
     }
     this.targets = [];
-    this.targetEndpoints = [];
+  }
+  init() {
+    if (!this.initCalled) {
+      this.initCalled = true;
+      this.onInit.call(this);
+    }
+  }
+  protected onInit() {
+    this.instanceInit();
   }
   write(value: any) {
-    this.targets.forEach((target: any, index: number) => {
-      if (target instanceof Stream) {
-        target.write(value);
-      } else if (typeof target === 'function') {
-        this.targetEndpoints[index].write((<Function>target)(value));
-      } else if (typeof target.tap === 'function') {
-        target.tap(value);
+    this.targets.forEach((target: StreamTarget, index: number) => {
+      if (target.endpoint instanceof Stream) {
+        target.stream.write(value);
+      } else if (typeof target.endpoint === 'function') {
+        target.stream.write((<Function>target.endpoint)(value));
+      } else if (typeof (<QueueInterface>target.endpoint).tap === 'function') {
+        (<QueueInterface>target.endpoint).tap(value);
       }
     });
   }
   pipe(target: Stream | QueueInterface | Function): StreamInterface {
-    this.targets.push(target);
     if (target instanceof Stream) {
-      this.targetEndpoints.push(null);
+      this.targets.push({
+        stream: target,
+        endpoint: target
+      })
       return target;
     } else if (target instanceof Function) {
-      let endpoint = new Stream();
-      this.targetEndpoints.push(endpoint);
-      return endpoint;
+      let stream = new Stream();
+      this.targets.push({
+        endpoint: (result: any) => {
+          stream.write((<Function>target)(result));
+        },
+        stream
+      });
+      this.init();
+      return stream;
     } else {
-      this.targetEndpoints.push(null);
-      return target.toStream();
+      let stream = target.toStream();
+      this.targets.push({
+        stream,
+        endpoint: target
+      });
+      target.callOnPopulate(() => {
+        this.init();
+      });
+      return stream;
     }
   }
 
@@ -89,10 +117,6 @@ class Stream implements StreamInterface {
     });
   }
 }
-
-export {
-  Stream
-};
 
 export type WriteFunction = (write: Function) => void;
 export type StreamOrWriteFunction = Stream | WriteFunction;

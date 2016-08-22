@@ -7,9 +7,10 @@ import {
 
 class Queue implements QueueInterface {
   name: string;
-  items: Array<QueueElementInterface>;
+  private items: Array<QueueElementInterface>;
   collect: Function;
-  stream: Stream;
+  private stream: Stream;
+  private populateCallbacks: Array<Function>;
   constructor(name: string, collect: Function) {
     this.name = name;
     this.items = [];
@@ -34,12 +35,23 @@ class Queue implements QueueInterface {
     }
   }
 
+  callOnPopulate(callback: Function) {
+    if (this.items.length > 0) {
+      callback.call(this);
+    } else {
+      this.populateCallbacks.push(callback);
+    }
+  }
+
   clear() {
     this.items = [];
   }
 
   push(element: QueueElementInterface) {
     this.items.push(element);
+    while(this.populateCallbacks.length > 0) {
+      this.populateCallbacks.pop().call(this);
+    }
   }
 
   toStream() {
