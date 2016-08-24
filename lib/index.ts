@@ -8,11 +8,10 @@ import {
 } from './streams/streams';
 export { default as QueueElement } from './queues/element';
 import Frame from './streams/frame';
-export { default as RAFQueue } from './queues/raf-queue';
 export { default as Queue } from './queues/queue';
+import { Terminal } from './streams/stream';
 
 export { default as Stream } from './streams/stream';
-export { stream } from './streams/stream';
 export { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
 
 interface ListenersMap {
@@ -41,17 +40,17 @@ function generateTrigger(key: string) {
   }
 }
 
-scroll.pipe((arg: any) => {
+scroll.pipe(new Terminal((arg: any) => {
   listeners.move.forEach((callback) => {
     callback.call(null, arg);
   });
-});
+}));
 
-resize.pipe((arg: any) => {
+resize.pipe(new Terminal((arg: any) => {
   listeners.resize.forEach((callback) => {
     callback.call(null, arg);
   });
-});
+}));
 
 if (w.hasDOM) {
   window.addEventListener('unload', generateTrigger('destroy'));
@@ -71,7 +70,7 @@ let cH = 0;
 
 let taskQueue: Function[] = [];
 
-pollStream.pipe((frame: Frame) => {
+pollStream.pipe(new Terminal((frame: Frame) => {
   cY = frame.scrollTop;
   cX = frame.scrollLeft;
   cW = frame.width;
@@ -80,7 +79,7 @@ pollStream.pipe((frame: Frame) => {
   while (taskQueue.length > 0) {
     taskQueue.pop().call(null, frame);
   }
-});
+}));
 
 export function on(eventName: string, callback: Function) {
   listeners[eventName].push(callback);

@@ -19,7 +19,6 @@
     "./lib/interfaces.ts",
     "./lib/queues/element.ts",
     "./lib/queues/queue.ts",
-    "./lib/queues/raf-queue.ts",
     "./lib/streams/frame.ts",
     "./lib/streams/stream.ts",
     "./lib/streams/streams.ts",

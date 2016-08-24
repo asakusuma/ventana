@@ -7,14 +7,11 @@ var element_1 = require('./queues/element');
 exports.QueueElement = element_1.default;
 var frame_1 = require('./streams/frame');
 exports.Frame = frame_1.default;
-var raf_queue_1 = require('./queues/raf-queue');
-exports.RAFQueue = raf_queue_1.default;
 var queue_1 = require('./queues/queue');
 exports.Queue = queue_1.default;
 var stream_1 = require('./streams/stream');
-exports.Stream = stream_1.default;
 var stream_2 = require('./streams/stream');
-exports.stream = stream_2.stream;
+exports.Stream = stream_2.default;
 var listeners = {
     move: [],
     resize: [],
@@ -30,16 +27,16 @@ function generateTrigger(key) {
         }
     };
 }
-streams_1.scroll.pipe(function (arg) {
+streams_1.scroll.pipe(new stream_1.Terminal(function (arg) {
     listeners.move.forEach(function (callback) {
         callback.call(null, arg);
     });
-});
-streams_1.resize.pipe(function (arg) {
+}));
+streams_1.resize.pipe(new stream_1.Terminal(function (arg) {
     listeners.resize.forEach(function (callback) {
         callback.call(null, arg);
     });
-});
+}));
 if (window_proxy_1.default.hasDOM) {
     window.addEventListener('unload', generateTrigger('destroy'));
     document.addEventListener('visibilitychange', function () {
@@ -56,7 +53,7 @@ var cX = 0;
 var cW = 0;
 var cH = 0;
 var taskQueue = [];
-streams_1.poll.pipe(function (frame) {
+streams_1.poll.pipe(new stream_1.Terminal(function (frame) {
     cY = frame.scrollTop;
     cX = frame.scrollLeft;
     cW = frame.width;
@@ -64,7 +61,7 @@ streams_1.poll.pipe(function (frame) {
     while (taskQueue.length > 0) {
         taskQueue.pop().call(null, frame);
     }
-});
+}));
 function on(eventName, callback) {
     listeners[eventName].push(callback);
 }
@@ -99,7 +96,7 @@ function getWindowRect(offset) {
 }
 exports.getWindowRect = getWindowRect;
 
-},{"./queues/element":3,"./queues/queue":4,"./queues/raf-queue":5,"./streams/frame":6,"./streams/stream":7,"./streams/streams":8,"./window-proxy":9}],2:[function(require,module,exports){
+},{"./queues/element":3,"./queues/queue":4,"./streams/frame":5,"./streams/stream":6,"./streams/streams":7,"./window-proxy":8}],2:[function(require,module,exports){
 "use strict";
 (function (RAFPhase) {
     RAFPhase[RAFPhase["MEASURE"] = 0] = "MEASURE";
@@ -121,11 +118,10 @@ exports.default = QueueElement;
 "use strict";
 var stream_1 = require('../streams/stream');
 var Queue = (function () {
-    function Queue(name, collect) {
+    function Queue(name) {
         this.name = name;
         this.items = [];
-        this.collect = collect;
-        this.stream = new stream_1.default(name + ' output stream');
+        this.stream = new stream_1.default();
     }
     Queue.prototype.remove = function (identifier) {
         var predicate;
@@ -153,49 +149,12 @@ var Queue = (function () {
     Queue.prototype.toStream = function () {
         return this.stream;
     };
-    Queue.prototype.tap = function (value) {
-        var _this = this;
-        this.items.map(function (element) {
-            if (!_this.intercept(value, element)) {
-                return _this.collect(_this.stream.write.bind(_this.stream), value, element);
-            }
-            return element;
-        });
-    };
-    Queue.prototype.intercept = function (value, element) {
-        return false;
-    };
     return Queue;
 }());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Queue;
 
-},{"../streams/stream":7}],5:[function(require,module,exports){
-"use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var queue_1 = require('./queue');
-var RAFQueue = (function (_super) {
-    __extends(RAFQueue, _super);
-    function RAFQueue() {
-        _super.apply(this, arguments);
-    }
-    RAFQueue.prototype.intercept = function (frame, element) {
-        if (frame.isMeasure()) {
-            element.bcr = element.el.getBoundingClientRect();
-            return true;
-        }
-        return false;
-    };
-    return RAFQueue;
-}(queue_1.default));
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = RAFQueue;
-
-},{"./queue":4}],6:[function(require,module,exports){
+},{"../streams/stream":6}],5:[function(require,module,exports){
 "use strict";
 var interfaces_1 = require('./../interfaces');
 var Frame = (function () {
@@ -209,112 +168,63 @@ var Frame = (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Frame;
 
-},{"./../interfaces":2}],7:[function(require,module,exports){
+},{"./../interfaces":2}],6:[function(require,module,exports){
 "use strict";
 var Stream = (function () {
-    function Stream(source) {
-        var _this = this;
-        this.name = 'anonymous';
-        if (typeof source === 'function') {
-            source.call(this, function () {
-                var args = [];
-                for (var _i = 0; _i < arguments.length; _i++) {
-                    args[_i - 0] = arguments[_i];
-                }
-                _this.write.apply(_this, args);
-            });
+    function Stream(options) {
+        if (options === void 0) { options = {}; }
+        this.options = options;
+        this.process = options.process || (function (identity) { return identity; });
+        if (options.init) {
+            options.init();
         }
-        else if (typeof source === 'string') {
-            this.name = source;
-        }
-        this.targets = [];
-        this.targetEndpoints = [];
     }
     Stream.prototype.write = function (value) {
         var _this = this;
-        this.targets.forEach(function (target, index) {
-            if (target instanceof Stream) {
-                target.write(value);
+        value = this.options.process ? this.options.process(value) : value;
+        if (value !== false) {
+            if (this.options.queue) {
+                this.options.queue.items.forEach(function (item) {
+                    _this.targets.forEach(function (target) {
+                        target.write(_this.process(value, item));
+                    });
+                });
             }
-            else if (typeof target === 'function') {
-                _this.targetEndpoints[index].write(target(value));
+            else {
+                this.targets.forEach(function (target) {
+                    target.write(_this.process(value));
+                });
             }
-            else if (typeof target.tap === 'function') {
-                target.tap(value);
-            }
-        });
+        }
     };
     Stream.prototype.pipe = function (target) {
         this.targets.push(target);
-        if (target instanceof Stream) {
-            this.targetEndpoints.push(null);
-            return target;
-        }
-        else if (target instanceof Function) {
-            var endpoint = new Stream();
-            this.targetEndpoints.push(endpoint);
-            return endpoint;
-        }
-        else {
-            this.targetEndpoints.push(null);
-            return target.toStream();
-        }
-    };
-    Stream.join = function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            args[_i - 0] = arguments[_i];
-        }
-        var cache = new Array(args.length);
-        return new Stream(function (write) {
-            var _this = this;
-            args.forEach(function (stream, i) {
-                stream.pipe(function (value) {
-                    cache[i] = value;
-                    _this.write(cache);
-                });
-            });
-        });
-    };
-    Stream.prototype.filter = function (first, second) {
-        var _this = this;
-        var state = typeof first !== 'function' && first;
-        var hasState = !!state;
-        var filter = hasState ? second : first;
-        return new Stream(function (write) {
-            _this.pipe(function (value) {
-                var filtered = hasState ? filter(state, value) : filter(value);
-                if (filtered) {
-                    write(filtered);
-                }
-            });
-        });
+        return target;
     };
     return Stream;
 }());
-exports.Stream = Stream;
-function toStream(sof) {
-    if (typeof sof === 'function') {
-        return new Stream(sof);
-    }
-    else if (sof instanceof Stream) {
-        return sof;
-    }
-}
-function stream() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i - 0] = arguments[_i];
-    }
-    args[0] = args[0] || new Stream();
-    return args.length > 1 ? Stream.join.apply(null, args.map(toStream)) : args[0];
-}
-exports.stream = stream;
-;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Stream;
+var Terminal = (function () {
+    function Terminal(terminal) {
+        this.targets = [];
+        this.terminal = terminal;
+    }
+    Terminal.prototype.write = function (value) {
+        var result = this.terminal(value);
+        this.targets.forEach(function (target) {
+            target.write(result);
+        });
+    };
+    Terminal.prototype.pipe = function (target) {
+        this.targets.push(target);
+        return target;
+    };
+    return Terminal;
+}());
+exports.Terminal = Terminal;
 
-},{}],8:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 "use strict";
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -344,60 +254,71 @@ var RAFStream = (function (_super) {
     };
     return RAFStream;
 }(stream_1.default));
-exports.RAFStream = RAFStream;
-var raf = new RAFStream('requestAnimationFrame');
+var raf = new stream_1.default({
+    init: function () {
+        var _this = this;
+        var pollForAF = function () {
+            _this.write(Date.now());
+            window_proxy_1.default.rAF(pollForAF);
+        };
+        window_proxy_1.default.rAF(pollForAF);
+    }
+});
 exports.raf = raf;
-var measure = raf.filter(function (frame) {
-    if (frame.phase === interfaces_1.RAFPhase.MEASURE) {
-        return frame;
+var measure = raf.pipe(new stream_1.default({
+    process: function (frame) {
+        if (frame.phase === interfaces_1.RAFPhase.MEASURE) {
+            return frame;
+        }
     }
-});
+}));
 exports.measure = measure;
-var poll = raf.filter(function (frame) {
-    if (frame.phase !== interfaces_1.RAFPhase.MEASURE) {
-        return frame;
+var poll = raf.pipe(new stream_1.default({
+    process: function (frame) {
+        if (frame.phase !== interfaces_1.RAFPhase.MEASURE) {
+            return frame;
+        }
     }
-});
+}));
 exports.poll = poll;
-var pollForAF = function () {
-    raf.write(Date.now());
-    window_proxy_1.default.rAF(pollForAF);
-};
-window_proxy_1.default.rAF(pollForAF);
 var w = -1;
 var h = -1;
-var resize = measure.filter(function (frame) {
-    var nH = frame.height;
-    var nW = frame.width;
-    if (nW !== w || nH !== h) {
-        h = nH;
-        w = nW;
-        return {
-            width: w,
-            height: h
-        };
+var resize = measure.pipe(new stream_1.default({
+    process: function (frame) {
+        var nH = frame.height;
+        var nW = frame.width;
+        if (nW !== w || nH !== h) {
+            h = nH;
+            w = nW;
+            return {
+                width: w,
+                height: h
+            };
+        }
     }
-});
+}));
 exports.resize = resize;
 var scrollTop = -1;
 var scrollLeft = -1;
-var scroll = measure.filter(function (frame) {
-    var newScrollTop = frame.scrollTop;
-    var newScrollLeft = frame.scrollLeft;
-    if (frame.phase === interfaces_1.RAFPhase.MEASURE && (newScrollTop !== scrollTop ||
-        newScrollLeft !== scrollLeft)) {
-        scrollTop = newScrollTop;
-        scrollLeft = newScrollLeft;
-        return {
-            timestamp: frame.timestamp,
-            scrollTop: scrollTop,
-            scrollLeft: scrollLeft
-        };
+var scroll = measure.pipe(new stream_1.default({
+    process: function (frame) {
+        var newScrollTop = frame.scrollTop;
+        var newScrollLeft = frame.scrollLeft;
+        if (frame.phase === interfaces_1.RAFPhase.MEASURE && (newScrollTop !== scrollTop ||
+            newScrollLeft !== scrollLeft)) {
+            scrollTop = newScrollTop;
+            scrollLeft = newScrollLeft;
+            return {
+                timestamp: frame.timestamp,
+                scrollTop: scrollTop,
+                scrollLeft: scrollLeft
+            };
+        }
     }
-});
+}));
 exports.scroll = scroll;
 
-},{"./../interfaces":2,"./../window-proxy":9,"./frame":6,"./stream":7}],9:[function(require,module,exports){
+},{"./../interfaces":2,"./../window-proxy":8,"./frame":5,"./stream":6}],8:[function(require,module,exports){
 "use strict";
 var nop = function () { return 0; };
 var hasDOM = !!((typeof window !== 'undefined') && window && (typeof document !== 'undefined') && document);

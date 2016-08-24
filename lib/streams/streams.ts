@@ -1,7 +1,7 @@
 import Stream from './stream';
 import W from './../window-proxy';
 import Frame from './frame';
-import { RAFPhase } from './../interfaces';
+import { RAFPhase, StreamInterface } from './../interfaces';
 
 class RAFStream extends Stream {
   write (timestamp: number) {
@@ -19,66 +19,78 @@ class RAFStream extends Stream {
   }
 }
 
-let raf = new RAFStream('requestAnimationFrame');
-
-let measure = raf.filter((frame: Frame) => {
-  if (frame.phase === RAFPhase.MEASURE) {
-    return frame;
+let raf = new Stream({
+  init() {
+    let pollForAF = () => {
+      this.write(Date.now());
+      W.rAF(pollForAF);
+    };
+    W.rAF(pollForAF);
   }
 });
 
-let poll = raf.filter((frame: Frame) => {
-  if (frame.phase !== RAFPhase.MEASURE) {
-    return frame;
+let measure = raf.pipe(new Stream({
+  process(frame: Frame) {
+    if (frame.phase === RAFPhase.MEASURE) {
+      return frame;
+    }
   }
-});
+}));
 
-let pollForAF = () => {
-  raf.write(Date.now());
-  W.rAF(pollForAF);
-};
-W.rAF(pollForAF);
+let poll = raf.pipe(new Stream({
+  process(frame: Frame) {
+    if (frame.phase !== RAFPhase.MEASURE) {
+      return frame;
+    }
+  }
+}));
+
+
 
 let w = -1;
 let h = -1;
 
-let resize = measure.filter((frame: Frame) => {
-  let nH = frame.height;
-  let nW = frame.width;
-  if (nW !== w || nH !== h) {
-    h = nH;
-    w = nW;
-    return {
-      width: w,
-      height: h
-    };
+let resize = measure.pipe(new Stream({
+  process(frame: Frame) {
+    let nH = frame.height;
+    let nW = frame.width;
+    if (nW !== w || nH !== h) {
+      h = nH;
+      w = nW;
+      return {
+        width: w,
+        height: h
+      };
+    }
   }
-});
+}));
 
 let scrollTop = -1;
 let scrollLeft = -1;
 
-let scroll = measure.filter((frame: Frame) => {
-  let newScrollTop = frame.scrollTop;
-  let newScrollLeft = frame.scrollLeft;
-  if (frame.phase === RAFPhase.MEASURE && (
-    newScrollTop !== scrollTop ||
-    newScrollLeft !== scrollLeft
-  )) {
-    scrollTop = newScrollTop;
-    scrollLeft = newScrollLeft;
-    return {
-      timestamp: frame.timestamp,
-      scrollTop,
-      scrollLeft
-    };
+let scroll = measure.pipe(new Stream({
+  process(frame: Frame) {
+    let newScrollTop = frame.scrollTop;
+    let newScrollLeft = frame.scrollLeft;
+    if (frame.phase === RAFPhase.MEASURE && (
+      newScrollTop !== scrollTop ||
+      newScrollLeft !== scrollLeft
+    )) {
+      scrollTop = newScrollTop;
+      scrollLeft = newScrollLeft;
+      return {
+        timestamp: frame.timestamp,
+        scrollTop,
+        scrollLeft
+      };
+    }
   }
-});
+}));
 
 
 
 export {
-  RAFStream,
+  StreamInterface,
   raf,
   resize,
   scroll,
