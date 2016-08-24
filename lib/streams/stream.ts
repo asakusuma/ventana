@@ -8,19 +8,22 @@ export interface StreamOptions {
 
 export default class Stream implements StreamInterface {
   private options: StreamOptions;
-  private process: Function;
-  private targets: Array<StreamInterface>;
+  private _process: Function;
+  private targets: Array<StreamInterface> = [];
   constructor (options: StreamOptions = {}) {
     this.options = options;
-    this.process = options.process || ((identity: any) => identity);
+    this._process = options.process || ((identity: any) => identity);
     if (options.init) {
       // TODO: Refactor to make lazy
-      options.init();
+      options.init.call(this);
     }
   }
+  process(value: any, item?: QueueElementInterface) {
+    return this._process.call(this, value, item);
+  }
   write(value: any) {
-    value = this.options.process ? this.options.process(value) : value;
-    if (value !== false) {
+    value = this.process ? this.process(value) : value;
+    if (value) {
       if (this.options.queue) {
         this.options.queue.items.forEach((item: QueueElementInterface) => {
           this.targets.forEach((target: any) => {

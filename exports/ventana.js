@@ -48,16 +48,8 @@ if (window_proxy_1.default.hasDOM) {
         }
     });
 }
-var cY = 0;
-var cX = 0;
-var cW = 0;
-var cH = 0;
 var taskQueue = [];
 streams_1.poll.pipe(new stream_1.Terminal(function (frame) {
-    cY = frame.scrollTop;
-    cX = frame.scrollLeft;
-    cW = frame.width;
-    cH = frame.height;
     while (taskQueue.length > 0) {
         taskQueue.pop().call(null, frame);
     }
@@ -70,31 +62,6 @@ function queue(callback) {
     taskQueue.push(callback);
 }
 exports.queue = queue;
-function mapBoundingRectToAbsolute(boundingRect) {
-    var dimensions = {
-        top: boundingRect.top + cY,
-        left: boundingRect.left + cX,
-        width: boundingRect.width,
-        height: boundingRect.height
-    };
-    return dimensions;
-}
-exports.mapBoundingRectToAbsolute = mapBoundingRectToAbsolute;
-function getWindowRect(offset) {
-    offset = offset || {
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-    };
-    return {
-        top: cY + offset.top,
-        left: cX + offset.left,
-        height: cH - offset.top - offset.bottom,
-        width: cW - offset.left - offset.right
-    };
-}
-exports.getWindowRect = getWindowRect;
 
 },{"./queues/element":3,"./queues/queue":4,"./streams/frame":5,"./streams/stream":6,"./streams/streams":7,"./window-proxy":8}],2:[function(require,module,exports){
 "use strict";
@@ -173,16 +140,20 @@ exports.default = Frame;
 var Stream = (function () {
     function Stream(options) {
         if (options === void 0) { options = {}; }
+        this.targets = [];
         this.options = options;
-        this.process = options.process || (function (identity) { return identity; });
+        this._process = options.process || (function (identity) { return identity; });
         if (options.init) {
-            options.init();
+            options.init.call(this);
         }
     }
+    Stream.prototype.process = function (value, item) {
+        return this._process.call(this, value, item);
+    };
     Stream.prototype.write = function (value) {
         var _this = this;
-        value = this.options.process ? this.options.process(value) : value;
-        if (value !== false) {
+        value = this.process ? this.process(value) : value;
+        if (value) {
             if (this.options.queue) {
                 this.options.queue.items.forEach(function (item) {
                     _this.targets.forEach(function (target) {
@@ -262,6 +233,23 @@ var raf = new stream_1.default({
             window_proxy_1.default.rAF(pollForAF);
         };
         window_proxy_1.default.rAF(pollForAF);
+    },
+    process: function (value) {
+        if (typeof value === 'number') {
+            var frame = new frame_1.default();
+            frame.timestamp = value;
+            frame.phase = interfaces_1.RAFPhase.MEASURE;
+            frame.scrollTop = window_proxy_1.default.getScrollTop();
+            frame.scrollLeft = window_proxy_1.default.getScrollLeft();
+            frame.width = window_proxy_1.default.getWidth();
+            frame.height = window_proxy_1.default.getHeight();
+            this.write(frame);
+            frame.phase = interfaces_1.RAFPhase.MUTATE;
+            return frame;
+        }
+        else {
+            return value;
+        }
     }
 });
 exports.raf = raf;

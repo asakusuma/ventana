@@ -1,29 +1,5 @@
 QUnit.module('Queue');
 
-QUnit.test('tap() works', function(assert){
-
-  var element = {
-    el: null,
-    callback: null,
-    id: null,
-    bcr: null
-  };
-
-  var taps = 0;
-  var value = null;
-  var queue = new ventana.Queue('test-queue', function(write, v) {
-    taps++;
-    value = v;
-  });
-
-  queue.push(element);
-
-  queue.tap('swag');
-
-  assert.equal(value, 'swag', 'value is passed');
-  assert.equal(taps, 1, 'consuming function called once');
-});
-
 QUnit.test('remove() works using id', function(assert){
   var first = {
     el: null,
@@ -46,13 +22,12 @@ QUnit.test('remove() works using id', function(assert){
   queue.push(first);
   queue.push(second);
 
-  queue.tap('swag');
+  assert.equal(queue.items.length, 2, 'There are two items in queue');
 
   queue.remove('first');
 
-  queue.tap('swag');
-
-  assert.equal(taps, 3, '3 items are tapped');
+  assert.equal(queue.items.length, 1, 'There is one item in queue');
+  assert.equal(queue.items[0].id, 'second', 'Second item is only item in queue');
 });
 
 
@@ -80,13 +55,12 @@ QUnit.test('remove() works using element', function(assert){
   queue.push(first);
   queue.push(second);
 
-  queue.tap('swag');
+  assert.equal(queue.items.length, 2, 'There are two items in queue');
 
   queue.remove(firstEl);
 
-  queue.tap('swag');
-
-  assert.equal(taps, 3, '3 items are tapped');
+  assert.equal(queue.items.length, 1, 'There is one item in queue');
+  assert.equal(queue.items[0].id, 'second', 'Second item is only item in queue');
 });
 
 QUnit.test('clear() works', function(assert){
@@ -111,11 +85,9 @@ QUnit.test('clear() works', function(assert){
   queue.push(first);
   queue.push(second);
 
-  queue.tap('swag');
+  assert.equal(queue.items.length, 2, 'There are two items in queue');
 
   queue.clear();
 
-  queue.tap('swag');
-
-  assert.equal(taps, 2, '2 items are tapped');
+  assert.equal(queue.items.length, 0, 'Queue is empty');
 });

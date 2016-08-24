@@ -26,6 +26,22 @@ let raf = new Stream({
       W.rAF(pollForAF);
     };
     W.rAF(pollForAF);
+  },
+  process(value: number | Frame) {
+    if (typeof value === 'number') {
+      let frame = new Frame();
+      frame.timestamp = value;
+      frame.phase = RAFPhase.MEASURE;
+      frame.scrollTop = W.getScrollTop();
+      frame.scrollLeft = W.getScrollLeft();
+      frame.width = W.getWidth();
+      frame.height = W.getHeight();
+      this.write(frame);
+      frame.phase = RAFPhase.MUTATE;
+      return frame;
+    } else {
+      return value;
+    }
   }
 });
 
