@@ -115,6 +115,7 @@ exports.QueueDOMElement = QueueDOMElement;
 var stream_1 = require('../streams/stream');
 var Queue = (function () {
     function Queue(name) {
+        this.populateCallbacks = [];
         this.name = name;
         this.items = [];
         this.stream = new stream_1.default();
@@ -140,10 +141,16 @@ var Queue = (function () {
         this.items = [];
     };
     Queue.prototype.push = function (element) {
+        if (this.items.length === 0) {
+            this.populateCallbacks.forEach(function (callback) { return callback(); });
+        }
         this.items.push(element);
     };
     Queue.prototype.toStream = function () {
         return this.stream;
+    };
+    Queue.prototype.callOnPopulate = function (callback) {
+        this.populateCallbacks.push(callback);
     };
     return Queue;
 }());
@@ -168,12 +175,17 @@ exports.default = Frame;
 "use strict";
 var Stream = (function () {
     function Stream(options) {
+        var _this = this;
         if (options === void 0) { options = {}; }
         this.targets = [];
+        this.refCount = 0;
+        this.populateCallbacks = [];
         this.options = options;
         this._process = options.process || (function (identity) { return identity; });
-        if (options.init) {
-            options.init.call(this);
+        if (options.queue) {
+            options.queue.callOnPopulate(function () {
+                _this.onPopulate();
+            });
         }
     }
     Stream.prototype.process = function (value, item) {
@@ -206,9 +218,25 @@ var Stream = (function () {
             });
         }
     };
+    Stream.prototype.onPopulate = function () {
+        if (this.refCount < 1 && this.options.init) {
+            this.options.init.call(this);
+        }
+        this.populateCallbacks.forEach(function (callback) { return callback(); });
+        this.refCount++;
+    };
     Stream.prototype.pipe = function (target) {
+        var _this = this;
         this.targets.push(target);
+        if (!this.options.queue) {
+            target.callOnPopulate(function () {
+                _this.onPopulate();
+            });
+        }
         return target;
+    };
+    Stream.prototype.callOnPopulate = function (callback) {
+        this.populateCallbacks.push(callback);
     };
     return Stream;
 }());
@@ -228,6 +256,9 @@ var Terminal = (function () {
     Terminal.prototype.pipe = function (target) {
         this.targets.push(target);
         return target;
+    };
+    Terminal.prototype.callOnPopulate = function (callback) {
+        callback();
     };
     return Terminal;
 }());

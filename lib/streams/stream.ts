@@ -11,12 +11,15 @@ export default class Stream implements StreamInterface {
   private options: StreamOptions;
   private _process: Function;
   private targets: Array<StreamInterface> = [];
+  private refCount: number = 0;
+  private populateCallbacks: Array<Function> = [];
   constructor (options: StreamOptions = {}) {
     this.options = options;
     this._process = options.process || ((identity: any) => identity);
-    if (options.init) {
-      // TODO: Refactor to make lazy
-      options.init.call(this);
+    if (options.queue) {
+      options.queue.callOnPopulate(() => {
+        this.onPopulate();
+      });
     }
   }
   process(value: any, item?: QueueElementInterface) {
@@ -45,9 +48,24 @@ export default class Stream implements StreamInterface {
       });
     }
   }
+  private onPopulate() {
+    if (this.refCount < 1 && this.options.init) {
+      this.options.init.call(this);
+    }
+    this.populateCallbacks.forEach((callback: Function) => callback());
+    this.refCount++;
+  }
   pipe(target: StreamInterface): StreamInterface {
     this.targets.push(target);
+    if (!this.options.queue) {
+      target.callOnPopulate(() => {
+        this.onPopulate();
+      });
+    }
     return target;
+  }
+  callOnPopulate(callback: Function) {
+    this.populateCallbacks.push(callback);
   }
 }
 
@@ -66,5 +84,8 @@ export class Terminal implements StreamInterface {
   pipe(target: StreamInterface) {
     this.targets.push(target);
     return target;
+  }
+  callOnPopulate(callback: Function) {
+    callback();
   }
 }

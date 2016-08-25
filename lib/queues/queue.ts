@@ -9,6 +9,7 @@ class Queue implements QueueInterface {
   name: string;
   items: Array<QueueElementInterface>;
   stream: Stream;
+  private populateCallbacks: Array<Function> = [];
   constructor(name: string) {
     this.name = name;
     this.items = [];
@@ -37,11 +38,18 @@ class Queue implements QueueInterface {
   }
 
   push(element: QueueElementInterface) {
+    if (this.items.length === 0) {
+      this.populateCallbacks.forEach((callback: Function) => callback());
+    }
     this.items.push(element);
   }
 
   toStream() {
     return this.stream;
+  }
+
+  callOnPopulate(callback: Function) {
+    this.populateCallbacks.push(callback);
   }
 }
 

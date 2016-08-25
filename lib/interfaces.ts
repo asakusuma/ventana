@@ -15,10 +15,12 @@ export interface QueueInterface {
   name: string;
   items: Array<QueueElementInterface>;
   push: (element: QueueElementInterface) => void;
-  toStream: () => StreamInterface
+  toStream: () => StreamInterface;
+  callOnPopulate: (callback: Function) => void;
 }
 
 export interface StreamInterface {
   write: (value: any) => void;
   pipe: (target: StreamInterface) => StreamInterface;
+  callOnPopulate: (callback: Function) => void;
 }
