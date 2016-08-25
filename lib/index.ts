@@ -6,15 +6,11 @@ import {
   poll as pollStream,
   measure as measureStream
 } from './streams/streams';
-export { default as QueueElement } from './queues/element';
+import { default as QueueElement, QueueDOMElement } from './queues/element';
 import Frame from './streams/frame';
-export { default as Queue } from './queues/queue';
-import { default as Queue } from './queues/queue';
+import { default as Queue, DOMQueue } from './queues/queue';
 import { Terminal, default as Stream } from './streams/stream';
-
-export { default as Stream } from './streams/stream';
-export { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
-import { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
+import { QueueElementInterface, QueueDOMElementInterface, StreamInterface, QueueInterface } from './interfaces';
 
 interface ListenersMap {
   move: Queue,
@@ -116,5 +112,15 @@ interface Offset {
 export {
   Offset,
   Frame,
-  RAFStream
+  RAFStream,
+  QueueElementInterface,
+  QueueDOMElementInterface,
+  StreamInterface,
+  QueueInterface,
+  Stream,
+  Queue,
+  DOMQueue,
+  QueueElement,
+  QueueDOMElement,
+  Terminal
 };

@@ -7,8 +7,11 @@ export interface QueueElementInterface {
   el?: Element;
   callback: Function;
   id: string;
-  bcr?: ClientRect;
-  output?: StreamInterface
+}
+
+export interface QueueDOMElementInterface extends QueueElementInterface {
+  el: Element;
+  bcr: ClientRect;
 }
 
 export interface QueueInterface {

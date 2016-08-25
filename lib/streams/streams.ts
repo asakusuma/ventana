@@ -3,22 +3,6 @@ import W from './../window-proxy';
 import Frame from './frame';
 import { RAFPhase, StreamInterface } from './../interfaces';
 
-class RAFStream extends Stream {
-  write (timestamp: number) {
-    let frame = new Frame();
-    frame.timestamp = timestamp;
-    frame.phase = RAFPhase.MEASURE;
-    frame.scrollTop = W.getScrollTop();
-    frame.scrollLeft = W.getScrollLeft();
-    frame.width = W.getWidth();
-    frame.height = W.getHeight();
-
-    super.write(frame);
-    frame.phase = RAFPhase.MUTATE;
-    super.write(frame);
-  }
-}
-
 let raf = new Stream({
   init() {
     let pollForAF = () => {

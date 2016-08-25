@@ -1,17 +1,16 @@
 import {
-  QueueElementInterface
+  QueueElementInterface,
+  QueueDOMElementInterface
 } from './../interfaces';
 
 class QueueElement implements QueueElementInterface {
-  el: Element;
   callback: Function;
   id: string;
-  bcr: ClientRect;
 }
 
 export default QueueElement;
 
-export class QueueDOMElement extends QueueElement {
+export class QueueDOMElement extends QueueElement implements QueueDOMElementInterface {
   el: Element;
   callback: Function;
   id: string;

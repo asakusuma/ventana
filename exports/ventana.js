@@ -5,25 +5,26 @@ var streams_1 = require('./streams/streams');
 exports.RAFStream = streams_1.raf;
 var element_1 = require('./queues/element');
 exports.QueueElement = element_1.default;
+exports.QueueDOMElement = element_1.QueueDOMElement;
 var frame_1 = require('./streams/frame');
 exports.Frame = frame_1.default;
 var queue_1 = require('./queues/queue');
 exports.Queue = queue_1.default;
-var queue_2 = require('./queues/queue');
+exports.DOMQueue = queue_1.DOMQueue;
 var stream_1 = require('./streams/stream');
-var stream_2 = require('./streams/stream');
-exports.Stream = stream_2.default;
+exports.Terminal = stream_1.Terminal;
+exports.Stream = stream_1.default;
 var queues = {
-    move: new queue_2.default('move'),
-    resize: new queue_2.default('resize'),
-    destroy: new queue_2.default('destroy'),
-    hide: new queue_2.default('hide'),
-    show: new queue_2.default('show')
+    move: new queue_1.default('move'),
+    resize: new queue_1.default('resize'),
+    destroy: new queue_1.default('destroy'),
+    hide: new queue_1.default('hide'),
+    show: new queue_1.default('show')
 };
 var hideStream = new stream_1.default();
 var showStream = new stream_1.default();
 var destroyStream = new stream_1.default();
-var taskQueue = new queue_2.default('tasks');
+var taskQueue = new queue_1.default('tasks');
 var process = function (frame, item) {
     return item.callback;
 };
@@ -112,6 +113,11 @@ exports.QueueDOMElement = QueueDOMElement;
 
 },{}],4:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var stream_1 = require('../streams/stream');
 var Queue = (function () {
     function Queue(name) {
@@ -156,6 +162,14 @@ var Queue = (function () {
 }());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Queue;
+var DOMQueue = (function (_super) {
+    __extends(DOMQueue, _super);
+    function DOMQueue() {
+        _super.apply(this, arguments);
+    }
+    return DOMQueue;
+}(Queue));
+exports.DOMQueue = DOMQueue;
 
 },{"../streams/stream":6}],5:[function(require,module,exports){
 "use strict";
@@ -266,34 +280,10 @@ exports.Terminal = Terminal;
 
 },{}],7:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
 var stream_1 = require('./stream');
 var window_proxy_1 = require('./../window-proxy');
 var frame_1 = require('./frame');
 var interfaces_1 = require('./../interfaces');
-var RAFStream = (function (_super) {
-    __extends(RAFStream, _super);
-    function RAFStream() {
-        _super.apply(this, arguments);
-    }
-    RAFStream.prototype.write = function (timestamp) {
-        var frame = new frame_1.default();
-        frame.timestamp = timestamp;
-        frame.phase = interfaces_1.RAFPhase.MEASURE;
-        frame.scrollTop = window_proxy_1.default.getScrollTop();
-        frame.scrollLeft = window_proxy_1.default.getScrollLeft();
-        frame.width = window_proxy_1.default.getWidth();
-        frame.height = window_proxy_1.default.getHeight();
-        _super.prototype.write.call(this, frame);
-        frame.phase = interfaces_1.RAFPhase.MUTATE;
-        _super.prototype.write.call(this, frame);
-    };
-    return RAFStream;
-}(stream_1.default));
 var raf = new stream_1.default({
     init: function () {
         var _this = this;

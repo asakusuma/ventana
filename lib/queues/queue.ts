@@ -2,7 +2,8 @@ import Stream from '../streams/stream';
 import {
   StreamInterface,
   QueueInterface,
-  QueueElementInterface
+  QueueElementInterface,
+  QueueDOMElementInterface
 } from './../interfaces';
 
 class Queue implements QueueInterface {
@@ -54,3 +55,6 @@ class Queue implements QueueInterface {
 }
 
 export default Queue;
+export class DOMQueue extends Queue {
+  items: Array<QueueDOMElementInterface>;
+}
