@@ -32,6 +32,7 @@ describe('Core window events', function() {
       });
     })
     .scrollTo(100)
+    .wait(10)
     .getExecution()
     .evaluate(function() {
       return window.STATE.moved;
