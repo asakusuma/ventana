@@ -4,7 +4,7 @@ export enum RAFPhase {
 }
 
 export interface QueueElementInterface {
-  el: Element;
+  el?: Element;
   callback: Function;
   id: string;
   bcr?: ClientRect;

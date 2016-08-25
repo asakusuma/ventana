@@ -4,6 +4,7 @@ export interface StreamOptions {
   init?: Function;
   process?: (value: any, item?: QueueElementInterface) => any;
   queue?: QueueInterface;
+  consume?: Boolean;
 }
 
 export default class Stream implements StreamInterface {
@@ -21,20 +22,27 @@ export default class Stream implements StreamInterface {
   process(value: any, item?: QueueElementInterface) {
     return this._process.call(this, value, item);
   }
-  write(value: any) {
-    value = this.process ? this.process(value) : value;
-    if (value) {
-      if (this.options.queue) {
-        this.options.queue.items.forEach((item: QueueElementInterface) => {
-          this.targets.forEach((target: any) => {
-            target.write(this.process(value, item));
-          });
-        });
-      } else {
-        this.targets.forEach((target: any) => {
-          target.write(this.process(value));
-        });
+  private handleQueue(value: any, item: QueueElementInterface) {
+    this.targets.forEach((target: any) => {
+      let result = this.process(value, item);
+      if (result) {
+        target.write(result);
       }
+    });
+  }
+  write(value: any) {
+    if (this.options.queue) {
+      if (this.options.consume) {
+        while (this.options.queue.items.length > 0) {
+          this.handleQueue(value, this.options.queue.items.pop());
+        }
+      } else {
+        this.options.queue.items.forEach((item: QueueElementInterface) => this.handleQueue(value, item));
+      }
+    } else if (value = this.process(value)) {
+      this.targets.forEach((target: any) => {
+        target.write(value);
+      });
     }
   }
   pipe(target: StreamInterface): StreamInterface {

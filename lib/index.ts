@@ -9,74 +9,94 @@ import {
 export { default as QueueElement } from './queues/element';
 import Frame from './streams/frame';
 export { default as Queue } from './queues/queue';
-import { Terminal } from './streams/stream';
+import { default as Queue } from './queues/queue';
+import { Terminal, default as Stream } from './streams/stream';
 
 export { default as Stream } from './streams/stream';
 export { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
+import { QueueElementInterface, StreamInterface, QueueInterface } from './interfaces';
 
 interface ListenersMap {
-  move: Function[],
-  resize: Function[],
-  destroy: Function[],
-  hide: Function[],
-  show: Function[],
-  [key: string]: Function[];
+  move: Queue,
+  resize: Queue,
+  destroy: Queue,
+  hide: Queue,
+  show: Queue,
+  [key: string]: Queue;
 }
 
-let listeners:ListenersMap = {
-  move: [],
-  resize: [],
-  destroy: [],
-  hide: [],
-  show: []
+let queues:ListenersMap = {
+  move: new Queue('move'),
+  resize: new Queue('resize'),
+  destroy: new Queue('destroy'),
+  hide: new Queue('hide'),
+  show: new Queue('show')
 };
 
-function generateTrigger(key: string) {
-  return () => {
-    let callbacks = listeners[key], len = callbacks.length, i = 0;
-    for (i = 0; i < len; i++) {
-      callbacks[i].call(null);
-    }
-  }
-}
+let hideStream = new Stream();
+let showStream = new Stream();
+let destroyStream = new Stream();
+let taskQueue: Queue = new Queue('tasks');
 
-scroll.pipe(new Terminal((arg: any) => {
-  listeners.move.forEach((callback) => {
-    callback.call(null, arg);
-  });
-}));
+let process = (frame: Frame, item: QueueElementInterface) => {
+  return item.callback;
+};
+let callbackTerminal = new Terminal((callback: Function) => callback());
 
-resize.pipe(new Terminal((arg: any) => {
-  listeners.resize.forEach((callback) => {
-    callback.call(null, arg);
-  });
-}));
+hideStream.pipe(new Stream({
+  queue: queues.hide,
+  process
+})).pipe(callbackTerminal);
+
+destroyStream.pipe(new Stream({
+  queue: queues.destroy,
+  process
+})).pipe(callbackTerminal);
+
+showStream.pipe(new Stream({
+  queue: queues.show,
+  process
+})).pipe(callbackTerminal);
+
+scroll.pipe(new Stream({
+  queue: queues.move,
+  process
+})).pipe(callbackTerminal);
+
+resize.pipe(new Stream({
+  queue: queues.resize,
+  process
+})).pipe(callbackTerminal);
+
+pollStream.pipe(new Stream({
+  consume: true,
+  queue: taskQueue,
+  process
+})).pipe(callbackTerminal);
 
 if (w.hasDOM) {
-  window.addEventListener('unload', generateTrigger('destroy'));
+  window.addEventListener('unload', destroyStream.write);
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
-      generateTrigger('show')();
+      showStream.write(Date.now());
     } else {
-      generateTrigger('hide')();
+      hideStream.write(Date.now());
     }
   });
 }
 
-let taskQueue: Function[] = [];
-
-pollStream.pipe(new Terminal((frame: Frame) => {
-  while (taskQueue.length > 0) {
-    taskQueue.pop().call(null, frame);
-  }
-}));
-
 export function on(eventName: string, callback: Function) {
-  listeners[eventName].push(callback);
+  queues[eventName].push({
+    callback,
+    id: null
+  });
 }
 
 export function queue(callback: Function) {
-  taskQueue.push(callback);
+  taskQueue.push({
+    callback,
+    id: null
+  });
 }
 
 interface AbsoluteRect {

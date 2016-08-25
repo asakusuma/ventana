@@ -9,57 +9,73 @@ var frame_1 = require('./streams/frame');
 exports.Frame = frame_1.default;
 var queue_1 = require('./queues/queue');
 exports.Queue = queue_1.default;
+var queue_2 = require('./queues/queue');
 var stream_1 = require('./streams/stream');
 var stream_2 = require('./streams/stream');
 exports.Stream = stream_2.default;
-var listeners = {
-    move: [],
-    resize: [],
-    destroy: [],
-    hide: [],
-    show: []
+var queues = {
+    move: new queue_2.default('move'),
+    resize: new queue_2.default('resize'),
+    destroy: new queue_2.default('destroy'),
+    hide: new queue_2.default('hide'),
+    show: new queue_2.default('show')
 };
-function generateTrigger(key) {
-    return function () {
-        var callbacks = listeners[key], len = callbacks.length, i = 0;
-        for (i = 0; i < len; i++) {
-            callbacks[i].call(null);
-        }
-    };
-}
-streams_1.scroll.pipe(new stream_1.Terminal(function (arg) {
-    listeners.move.forEach(function (callback) {
-        callback.call(null, arg);
-    });
-}));
-streams_1.resize.pipe(new stream_1.Terminal(function (arg) {
-    listeners.resize.forEach(function (callback) {
-        callback.call(null, arg);
-    });
-}));
+var hideStream = new stream_1.default();
+var showStream = new stream_1.default();
+var destroyStream = new stream_1.default();
+var taskQueue = new queue_2.default('tasks');
+var process = function (frame, item) {
+    return item.callback;
+};
+var callbackTerminal = new stream_1.Terminal(function (callback) { return callback(); });
+hideStream.pipe(new stream_1.default({
+    queue: queues.hide,
+    process: process
+})).pipe(callbackTerminal);
+destroyStream.pipe(new stream_1.default({
+    queue: queues.destroy,
+    process: process
+})).pipe(callbackTerminal);
+showStream.pipe(new stream_1.default({
+    queue: queues.show,
+    process: process
+})).pipe(callbackTerminal);
+streams_1.scroll.pipe(new stream_1.default({
+    queue: queues.move,
+    process: process
+})).pipe(callbackTerminal);
+streams_1.resize.pipe(new stream_1.default({
+    queue: queues.resize,
+    process: process
+})).pipe(callbackTerminal);
+streams_1.poll.pipe(new stream_1.default({
+    consume: true,
+    queue: taskQueue,
+    process: process
+})).pipe(callbackTerminal);
 if (window_proxy_1.default.hasDOM) {
-    window.addEventListener('unload', generateTrigger('destroy'));
+    window.addEventListener('unload', destroyStream.write);
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
-            generateTrigger('show')();
+            showStream.write(Date.now());
         }
         else {
-            generateTrigger('hide')();
+            hideStream.write(Date.now());
         }
     });
 }
-var taskQueue = [];
-streams_1.poll.pipe(new stream_1.Terminal(function (frame) {
-    while (taskQueue.length > 0) {
-        taskQueue.pop().call(null, frame);
-    }
-}));
 function on(eventName, callback) {
-    listeners[eventName].push(callback);
+    queues[eventName].push({
+        callback: callback,
+        id: null
+    });
 }
 exports.on = on;
 function queue(callback) {
-    taskQueue.push(callback);
+    taskQueue.push({
+        callback: callback,
+        id: null
+    });
 }
 exports.queue = queue;
 
@@ -73,6 +89,11 @@ var RAFPhase = exports.RAFPhase;
 
 },{}],3:[function(require,module,exports){
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var QueueElement = (function () {
     function QueueElement() {
     }
@@ -80,6 +101,14 @@ var QueueElement = (function () {
 }());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = QueueElement;
+var QueueDOMElement = (function (_super) {
+    __extends(QueueDOMElement, _super);
+    function QueueDOMElement() {
+        _super.apply(this, arguments);
+    }
+    return QueueDOMElement;
+}(QueueElement));
+exports.QueueDOMElement = QueueDOMElement;
 
 },{}],4:[function(require,module,exports){
 "use strict";
@@ -150,22 +179,31 @@ var Stream = (function () {
     Stream.prototype.process = function (value, item) {
         return this._process.call(this, value, item);
     };
+    Stream.prototype.handleQueue = function (value, item) {
+        var _this = this;
+        this.targets.forEach(function (target) {
+            var result = _this.process(value, item);
+            if (result) {
+                target.write(result);
+            }
+        });
+    };
     Stream.prototype.write = function (value) {
         var _this = this;
-        value = this.process ? this.process(value) : value;
-        if (value) {
-            if (this.options.queue) {
-                this.options.queue.items.forEach(function (item) {
-                    _this.targets.forEach(function (target) {
-                        target.write(_this.process(value, item));
-                    });
-                });
+        if (this.options.queue) {
+            if (this.options.consume) {
+                while (this.options.queue.items.length > 0) {
+                    this.handleQueue(value, this.options.queue.items.pop());
+                }
             }
             else {
-                this.targets.forEach(function (target) {
-                    target.write(_this.process(value));
-                });
+                this.options.queue.items.forEach(function (item) { return _this.handleQueue(value, item); });
             }
+        }
+        else if (value = this.process(value)) {
+            this.targets.forEach(function (target) {
+                target.write(value);
+            });
         }
     };
     Stream.prototype.pipe = function (target) {

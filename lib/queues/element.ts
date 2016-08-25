@@ -10,3 +10,10 @@ class QueueElement implements QueueElementInterface {
 }
 
 export default QueueElement;
+
+export class QueueDOMElement extends QueueElement {
+  el: Element;
+  callback: Function;
+  id: string;
+  bcr: ClientRect;
+}
