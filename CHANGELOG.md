@@ -1,6 +1,6 @@
 # Ventana Changelog
 
-### 0.5.0 (July 13, 2016)
+### 0.6.0 (August 25, 2016)
 
   - Removed `getWindowRect()`
   - Removed `mapBoundingRectToAbsolute()`
