@@ -338,37 +338,41 @@ var poll = raf.pipe(new stream_1.default({
     }
 }));
 exports.poll = poll;
-var w = -1;
-var h = -1;
 var resize = measure.pipe(new stream_1.default({
+    init: function () {
+        this.w = window_proxy_1.default.getWidth();
+        this.h = window_proxy_1.default.getHeight();
+    },
     process: function (frame) {
         var nH = frame.height;
         var nW = frame.width;
-        if (nW !== w || nH !== h) {
-            h = nH;
-            w = nW;
+        if (nW !== this.w || nH !== this.h) {
+            this.h = nH;
+            this.w = nW;
             return {
-                width: w,
-                height: h
+                width: nW,
+                height: nH
             };
         }
     }
 }));
 exports.resize = resize;
-var scrollTop = -1;
-var scrollLeft = -1;
 var scroll = measure.pipe(new stream_1.default({
+    init: function () {
+        this.scrollTop = window_proxy_1.default.getScrollTop();
+        this.scrollLeft = window_proxy_1.default.getScrollLeft();
+    },
     process: function (frame) {
         var newScrollTop = frame.scrollTop;
         var newScrollLeft = frame.scrollLeft;
-        if (frame.phase === interfaces_1.RAFPhase.MEASURE && (newScrollTop !== scrollTop ||
-            newScrollLeft !== scrollLeft)) {
-            scrollTop = newScrollTop;
-            scrollLeft = newScrollLeft;
+        if (frame.phase === interfaces_1.RAFPhase.MEASURE && (newScrollTop !== this.scrollTop ||
+            newScrollLeft !== this.scrollLeft)) {
+            this.scrollTop = newScrollTop;
+            this.scrollLeft = newScrollLeft;
             return {
                 timestamp: frame.timestamp,
-                scrollTop: scrollTop,
-                scrollLeft: scrollLeft
+                newScrollTop: newScrollTop,
+                newScrollLeft: newScrollLeft
             };
         }
     }

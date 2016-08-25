@@ -61,43 +61,43 @@ let poll = raf.pipe(new Stream({
   }
 }));
 
-
-
-let w = -1;
-let h = -1;
-
 let resize = measure.pipe(new Stream({
+  init() {
+    this.w = W.getWidth();
+    this.h = W.getHeight();
+  },
   process(frame: Frame) {
     let nH = frame.height;
     let nW = frame.width;
-    if (nW !== w || nH !== h) {
-      h = nH;
-      w = nW;
+    if (nW !== this.w || nH !== this.h) {
+      this.h = nH;
+      this.w = nW;
       return {
-        width: w,
-        height: h
+        width: nW,
+        height: nH
       };
     }
   }
 }));
 
-let scrollTop = -1;
-let scrollLeft = -1;
-
 let scroll = measure.pipe(new Stream({
+  init() {
+    this.scrollTop = W.getScrollTop();
+    this.scrollLeft = W.getScrollLeft();
+  },
   process(frame: Frame) {
     let newScrollTop = frame.scrollTop;
     let newScrollLeft = frame.scrollLeft;
     if (frame.phase === RAFPhase.MEASURE && (
-      newScrollTop !== scrollTop ||
-      newScrollLeft !== scrollLeft
+      newScrollTop !== this.scrollTop ||
+      newScrollLeft !== this.scrollLeft
     )) {
-      scrollTop = newScrollTop;
-      scrollLeft = newScrollLeft;
+      this.scrollTop = newScrollTop;
+      this.scrollLeft = newScrollLeft;
       return {
         timestamp: frame.timestamp,
-        scrollTop,
-        scrollLeft
+        newScrollTop,
+        newScrollLeft
       };
     }
   }
