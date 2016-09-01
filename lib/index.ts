@@ -71,7 +71,9 @@ pollStream.pipe(new Stream({
 })).pipe(callbackTerminal);
 
 if (w.hasDOM) {
-  window.addEventListener('unload', destroyStream.write);
+  window.addEventListener('unload', (e: any) => {
+    destroyStream.write.call(destroyStream, e);
+  });
   document.addEventListener('visibilitychange', function() {
     if (document.visibilityState === 'visible') {
       showStream.write(Date.now());

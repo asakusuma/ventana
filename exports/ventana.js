@@ -55,7 +55,9 @@ streams_1.poll.pipe(new stream_1.default({
     process: process
 })).pipe(callbackTerminal);
 if (window_proxy_1.default.hasDOM) {
-    window.addEventListener('unload', destroyStream.write);
+    window.addEventListener('unload', function (e) {
+        destroyStream.write.call(destroyStream, e);
+    });
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
             showStream.write(Date.now());
