@@ -4,3 +4,4 @@ tmp
 exports/cjs
 old-lib
 tests/consumers/local
+exports/es6
