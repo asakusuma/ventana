@@ -5,3 +5,4 @@ exports/cjs
 old-lib
 tests/consumers/local
 exports/es6
+.vscode
