@@ -26,13 +26,15 @@ export default class Stream implements StreamInterface {
     return this._process.call(this, value, item);
   }
   private handleQueue(value: any, item: QueueElementInterface) {
-    this.targets.forEach((target: any) => {
+    for (let i = 0; i < this.targets.length; i++) {
+      let target = this.targets[i];
       let result = this.process(value, item);
       if (result) {
         target.write(result);
-      }
-    });
+      };
+    }
   }
+  // This likely has JITing problems
   write(value: any) {
     if (this.options.queue) {
       if (this.options.consume) {
@@ -40,12 +42,16 @@ export default class Stream implements StreamInterface {
           this.handleQueue(value, this.options.queue.items.pop());
         }
       } else {
-        this.options.queue.items.forEach((item: QueueElementInterface) => this.handleQueue(value, item));
+        for (let i = 0; i < this.options.queue.items.length; i++) {
+          let item = this.options.queue.items[i];
+          this.handleQueue(value, item);
+        }
       }
     } else if (value = this.process(value)) {
-      this.targets.forEach((target: any) => {
+      for (let i = 0; i < this.targets.length; i++) {
+        let target = this.targets[i];
         target.write(value);
-      });
+      }
     }
   }
   private onPopulate() {
@@ -77,9 +83,11 @@ export class Terminal implements StreamInterface {
   }
   write(value: any) {
     let result = this.terminal(value);
-    this.targets.forEach((target: any) => {
+
+    for (let i = 0; i < this.targets.length; i++) {
+      let target = this.targets[i];
       target.write(result);
-    });
+    }
   }
   pipe(target: StreamInterface) {
     this.targets.push(target);
