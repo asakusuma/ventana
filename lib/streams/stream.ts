@@ -8,13 +8,17 @@ export interface StreamOptions {
 }
 
 export default class Stream implements StreamInterface {
-  private options: StreamOptions;
+  private init: Function;
+  private queue: QueueInterface;
+  private consume: Boolean;
   private _process: Function;
   private targets: Array<StreamInterface> = [];
   private refCount: number = 0;
   private populateCallbacks: Array<Function> = [];
   constructor (options: StreamOptions = {}) {
-    this.options = options;
+    this.consume = options.consume || false;
+    this.queue = options.queue || null;
+    this.init = options.init || null;
     this._process = options.process || ((identity: any) => identity);
     if (options.queue) {
       options.queue.callOnPopulate(() => {
@@ -27,43 +31,40 @@ export default class Stream implements StreamInterface {
   }
   private handleQueue(value: any, item: QueueElementInterface) {
     for (let i = 0; i < this.targets.length; i++) {
-      let target = this.targets[i];
       let result = this.process(value, item);
       if (result) {
-        target.write(result);
+        this.targets[i].write(result);
       };
     }
   }
   // This likely has JITing problems
   write(value: any) {
-    if (this.options.queue) {
-      if (this.options.consume) {
-        while (this.options.queue.items.length > 0) {
-          this.handleQueue(value, this.options.queue.items.pop());
+    if (this.queue) {
+      if (this.consume) {
+        while (this.queue.items.length > 0) {
+          this.handleQueue(value, this.queue.items.pop());
         }
       } else {
-        for (let i = 0; i < this.options.queue.items.length; i++) {
-          let item = this.options.queue.items[i];
-          this.handleQueue(value, item);
+        for (let i = 0; i < this.queue.items.length; i++) {
+          this.handleQueue(value, this.queue.items[i]);
         }
       }
     } else if (value = this.process(value)) {
       for (let i = 0; i < this.targets.length; i++) {
-        let target = this.targets[i];
-        target.write(value);
+        this.targets[i].write(value);
       }
     }
   }
   private onPopulate() {
-    if (this.refCount < 1 && this.options.init) {
-      this.options.init.call(this);
+    if (this.refCount < 1 && this.init) {
+      this.init.call(this);
     }
     this.populateCallbacks.forEach((callback: Function) => callback());
     this.refCount++;
   }
   pipe(target: StreamInterface): StreamInterface {
     this.targets.push(target);
-    if (!this.options.queue) {
+    if (!this.queue) {
       target.callOnPopulate(() => {
         this.onPopulate();
       });
@@ -83,10 +84,8 @@ export class Terminal implements StreamInterface {
   }
   write(value: any) {
     let result = this.terminal(value);
-
     for (let i = 0; i < this.targets.length; i++) {
-      let target = this.targets[i];
-      target.write(result);
+      this.targets[i].write(result);
     }
   }
   pipe(target: StreamInterface) {
